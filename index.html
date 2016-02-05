@@ -39,20 +39,20 @@
 
 		// Load resources
 		var sounds = {
-			"powerup": new Audio("http://nimos.ws/sounds/powerup.wav"),
-			"laser": new Audio("http://nimos.ws/sounds/laser.wav"),
-			"explosion": new Audio("http://nimos.ws/sounds/explosion.wav"),
-			"normalshot": new Audio("http://nimos.ws/sounds/normalshot.wav"),
-			"flame": new Audio("http://nimos.ws/sounds/flame.wav"),
-			"death": new Audio("http://nimos.ws/sounds/death.wav"),
+			"powerup": new Audio("/assets/sounds/powerup.wav"),
+			"laser": new Audio("/assets/sounds/laser.wav"),
+			"explosion": new Audio("/assets/sounds/explosion.wav"),
+			"normalshot": new Audio("/assets/sounds/normalshot.wav"),
+			"flame": new Audio("/assets/sounds/flame.wav"),
+			"death": new Audio("/assets/sounds/death.wav"),
 		};
 
 		var sprites = {}
 		sprites.cover = new Image()
-		sprites.cover.src = "http://nimos.ws/sounds/sQVV6yU.jpg"
+		sprites.cover.src = "/assets/images/cover.jpg"
 
 		sprites.covertext = new Image()
-		sprites.covertext.src = "http://nimos.ws/sounds/entername.png"
+		sprites.covertext.src = "/assets/images/entername.png"
 
 		// Shifting color used for powerups;
 		var rainbowAnimation = function () {
@@ -315,7 +315,7 @@
 		}
 
 		// Open the socket and add listeners
-		var sock = io();
+		var sock = io("http://joterblox.rocks:3000");
 		sock.on("update", handleUpdate);
 		sock.on("hud", updateHud);
 
