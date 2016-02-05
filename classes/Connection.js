@@ -88,6 +88,7 @@ var Connection = function (game, socket) {
     // Add socket listeners, mostly self explanatory
     var self = this;
     socket.on('setName', function(n){
+        n = n.substring(0,24);
         name = n;
         self.name = n;
         spawnPlayer();
