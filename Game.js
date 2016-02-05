@@ -10,6 +10,7 @@ app.get('/', function(req, res){
 });
 
 app.use('/assets', express.static('assets'));
+app.use('/static', express.static('static'));
 
 http.listen(3000, function(){
   console.log('listening on *:3000');
