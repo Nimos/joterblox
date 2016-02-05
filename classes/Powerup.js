@@ -1,8 +1,7 @@
 // Powerup class
 var Powerup = function (game) {
     // Possible powerup types
-    types = ["laser", "grenades", "flamethrower"];
-
+    types = ["laser", "grenades", "flamethrower","shotgun"];
     // Pick random powerup type
     this.content = types[Math.floor(Math.random()*types.length)]
 
