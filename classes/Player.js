@@ -79,6 +79,8 @@ var Player = function (game, connection, name, color) {
         if (keys.space) {
             this.weapon.shoot(this, this.pos, cursor)
         }
+        // process ammo reload
+        this.weapon.updateAmmo(keys.space)
 
         // Fall
         this.speed[1] -= gravity;
@@ -103,9 +105,6 @@ var Player = function (game, connection, name, color) {
             this.pos[1] = newpos[1];
             this.state = JUMPING;
         }
-
-        // process ammo reload
-        this.weapon.updateAmmo()
 
         // die if we're dead
         if (this.hp <= 0) {

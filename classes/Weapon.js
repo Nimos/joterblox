@@ -21,7 +21,7 @@ var Weapon = function (game, name, owner) {
     this.onShot; // Function (position, target) - What to do when this weapon is fired
 
     if (name == "flamethrower") {
-        this.maxAmmo = 2;
+        this.maxAmmo = 50;
         this.ammoRecharge = 1;
         this.bulletSize = 20;
         this.bulletSpeed = 25;
@@ -135,7 +135,7 @@ var Weapon = function (game, name, owner) {
         this.bulletGravity = 1;
         this.maxAmmo = 5;
         this.ammo = 5;
-        this.ammoRecharge = 15;
+        this.ammoRecharge = 7;
 
         this.bulletSize = 4;
         this.bulletColor = "rgb(255,0,0)"
@@ -170,7 +170,9 @@ var Weapon = function (game, name, owner) {
     }
 
     // Called every tick to recharge ammo
-    this.updateAmmo = function () {
+    this.updateAmmo = function (shooting) {
+        // For more than one-shot weapons, don't recharge when shoot button is held
+        if (this.maxAmmo != 1 && shooting) return;
         if (this.ammo < this.maxAmmo) {
             this.ammoTicks++;
             this.ammoTicks %= this.ammoRecharge;
