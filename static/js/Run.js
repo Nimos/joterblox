@@ -13,6 +13,9 @@ var messagelog = [];
 // Are we holding tab right now?
 var showScores = false;
 
+// Are we holding alt right now?
+var showLocationFinder = false;
+
 // Information about the UI
 var hud = {"hp": 0, "ping": 0, "showscreen": 2}
 
@@ -205,6 +208,16 @@ var drawHUD = function (ctx, hud) {
         ctx.fillStyle = "#FF8800";
         ctx.fillRect(c.width - 16, c.height - 38 + steps2 * steps, 5, 38 - steps2 * steps);
     }
+
+    // Green triangle over player when holding donw the alt key
+    if (showLocationFinder) {
+        ctx.font = "15px sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillStyle="#00CC00";
+        hud.playerY = state.map.size[1]-hud.playerY; // 80%
+        ctx.fillText("▼", hud.playerX, hud.playerY-30);
+        ctx.strokeText("▼", hud.playerX, hud.playerY-30);
+    }
 }
 
 var drawDeathScreen = function (ctx, hud) {
@@ -243,7 +256,6 @@ var drawScoreboard = function (ctx, state) {
         ctx.fillText((i + 1) + ". " + s.name + ": " + s.score + " points (" + s.ping + " ms)", 105, 115 + i * 20);
     }
 }
-
 
 // Listener for update socket events
 // Redraws the game based on the last update, plays sounds and displays messages
@@ -295,7 +307,7 @@ var updateHud = function (data) {
 }
 
 // Open the socket and add listeners
-var sock = io("http://joterblox.rocks:3000");
+var sock = io(window.location.hostname+":3000");
 sock.on("update", handleUpdate);
 sock.on("hud", updateHud);
 
@@ -346,6 +358,16 @@ document.onkeydown = function (e) {
         showScores = true;
         e.preventDefault()
     }
+
+    if (e.keyCode == "18") {
+        showLocationFinder = true;
+        e.preventDefault();
+    }
+
+    // Disable Alt+Arrows and Alt+WASD browser shortcuts
+    if (e.altKey && ([37, 38, 39, 40, 87, 83, 65, 68].indexOf(e.keyCode) != -1)) {
+        e.preventDefault();
+    }
 };
 
 document.onkeyup = function (e) {
@@ -366,6 +388,9 @@ document.onkeyup = function (e) {
     }
     if (e.keyCode == "9") {
         showScores = false;
+    }
+    if (e.keyCode == "18") {
+        showLocationFinder = false;
     }
 };
 
