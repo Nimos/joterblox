@@ -66,16 +66,6 @@ var Game = function () {
         // Reset our sound and message queue
         this.sounds = [];
         this.messages = [];
-        
-        // Iterate over connections to do connection things
-        for (var i=0; i<connections.length; i++) {
-            var c = connections[i];
-            var r = c.update();
-            if (!r) { // remove connection if its update() returns false
-                connections.splice(i--, 1);
-                continue;
-            }
-        }
 
         // Iterate over actors to do actor things
         for (var i=0; i<actors.length; i++) {
@@ -88,6 +78,16 @@ var Game = function () {
             var r = actors[i].update();
             if (!r) { // remove actor if its update() returns false
                 actors.splice(i--, 1);
+                continue;
+            }
+        }
+
+        // Iterate over connections to do connection things
+        for (var i=0; i<connections.length; i++) {
+            var c = connections[i];
+            var r = c.update();
+            if (!r) { // remove connection if its update() returns false
+                connections.splice(i--, 1);
                 continue;
             }
         }
