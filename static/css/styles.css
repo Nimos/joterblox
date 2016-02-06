@@ -1,11 +1,9 @@
 body {
 	text-align: center;
 }
-
 canvas {
 	border: 1px solid black;
 }
-
 canvas:hover {
 	cursor: none;
 }

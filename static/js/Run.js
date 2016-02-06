@@ -214,12 +214,17 @@ var drawHUD = function (ctx, hud) {
 
     // Green triangle over player when holding donw the alt key
     if (showLocationFinder) {
-        ctx.font = "15px sans-serif";
-        ctx.textAlign = "center";
-        ctx.fillStyle="#00CC00";
-        hud.playerY = state.map.size[1]-hud.playerY; // 80%
-        ctx.fillText("▼", hud.playerX, hud.playerY-30);
-        ctx.strokeText("▼", hud.playerX, hud.playerY-30);
+        try {
+            ctx.font = "15px sans-serif";
+            ctx.textAlign = "center";
+            ctx.fillStyle = "rgb(" + hud.playerColor[0] + "," + hud.playerColor[1] + "," + hud.playerColor[2] + ")";
+            hud.playerY = state.map.size[1] - hud.playerY; // 80%
+            ctx.fillText("▼", hud.playerX, hud.playerY - 30);
+            ctx.strokeStyle = "black";
+            ctx.strokeText("▼", hud.playerX, hud.playerY - 30);
+        } catch(err) {
+            // A dead player does not have a color
+        }
     }
 }
 
@@ -362,11 +367,6 @@ document.onkeydown = function (e) {
         e.preventDefault()
     }
 
-    if (e.keyCode == "18") {
-        showLocationFinder = true;
-        e.preventDefault();
-    }
-
     // Disable Alt+Arrows and Alt+WASD browser shortcuts
     if (e.altKey && ([37, 38, 39, 40, 87, 83, 65, 68].indexOf(e.keyCode) != -1)) {
         e.preventDefault();
@@ -392,8 +392,11 @@ document.onkeyup = function (e) {
     if (e.keyCode == "9") {
         showScores = false;
     }
+
+    // Do this onkeyup to prevent holding down the key toggling it on and off very fast
     if (e.keyCode == "18") {
-        showLocationFinder = false;
+        showLocationFinder = !showLocationFinder;
+        e.preventDefault();
     }
 };
 
