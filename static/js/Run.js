@@ -19,6 +19,8 @@ var showLocationFinder = false;
 // Information about the UI
 var hud = {"hp": 0, "ping": 0, "showscreen": 2}
 
+// Currently selected input field
+var selectedInput = null;
 
 // Load resources
 var sounds = {
@@ -70,6 +72,78 @@ var rainbowAnimation = function () {
 
 var rainbow = new rainbowAnimation()
 
+// Canvas only input element
+var CanvasInput = function (ctx) {
+    this.ctx = ctx;                 // the context to draw on
+    this.name = name;               // Name for checking on submit
+    this.x;                         // x-pos of the input text
+    this.y;                         // y-pos of the input text
+
+    this.text = "";                 // value
+    this.maxLength = 30;            // maximum length of the input
+
+    this.fontSize = 30;             // font size in pt
+    this.fontFace = "sans-serif";   // font face
+    this.color = "black";           // color of the text
+    this.align = "center";          // alignment ("left", "right", "center") - TODO currently only supports center
+
+    this.backgroundColor = null;    // color of the background - TODO not implemented yet
+    this.border = false;            // does the input have a border? - TODO not implemented yet
+    this.borderColor = null;        // color of the border - TODO not implemented yet
+
+    // Handle selection of multiple inputs on one screen
+    c.onclick = function(e) {
+        // TODO
+        // is the position of the cursor within the bounds of this input?
+        //      -> get width via maxLength
+        //      -> get height via fontSize
+        // what happens to data from the old input? -> need to call submit() somewhere
+        // selectedInput = this;
+    };
+
+    // Draw this input to the canvas
+    this.draw = function() {
+        // Set font properties
+        this.ctx.textAlign = this.align;
+        this.ctx.font = this.fontSize + "px " + this.fontFace;
+        this.ctx.fillStyle = this.color;
+
+        // Display blinking underscore if input is possible, none if maxLength is reached
+        if (this.text.length == this.maxLength) {
+            ctx.fillText(this.text, this.x, this.y);
+        } else {
+            if (animFrames % 50 > 25 && selectedInput == this) {
+                ctx.fillText(this.text + "_", this.x, this.y);
+            } else {
+                ctx.fillText(this.text + " ", this.x, this.y);
+            }
+        }
+    };
+
+    // Remove the last character from text
+    this.pop = function() {
+        if(this.text.length > 0) {
+            this.text = this.text.substring(0, this.text.length-1);
+        }
+    };
+
+    // Add character to text
+    this.push = function(char) {
+        if (this.text.length < this.maxLength) {
+            this.text += char[0];
+        }
+    };
+
+    // Remove this as selected input, return text and call the callback method (if given)
+    this.submit = function(callback) {
+        if (callback) {
+            callback(this.text);
+        }
+        selectedInput = null;
+        return this.text;
+    }
+};
+
 // Frame counter to base animations on
 var animFrames = 0;
 
@@ -90,9 +164,18 @@ var drawMenu = function () {
     c.width = 640;
     c.height = 480;
     ctx.drawImage(sprites.cover, 0, 0, 640, 330)
-    if (animFrames % 50 > 25) {
-        ctx.drawImage(sprites.covertext, (c.width - sprites.covertext.width) / 2, 350)
+    ctx.drawImage(sprites.covertext, (c.width - sprites.covertext.width) / 2, 350)
+
+    // Input for entering name (You only draw once)
+    if (!selectedInput) {
+        selectedInput = new CanvasInput(ctx, "setName");
+        selectedInput.maxLength = 24;
+        selectedInput.align = "center";
+        selectedInput.fontFace = "monospace";
+        selectedInput.x = c.width/2;
+        selectedInput.y = 450;
     }
+    selectedInput.draw();
 }
 
 var drawMap = function (ctx, state) {
@@ -346,6 +429,37 @@ c.onmouseup = function (e) {
 
 // all kinds of keys
 document.onkeydown = function (e) {
+    // Do this if an input element is focused
+    if (selectedInput) {
+        // Valid characters for user input
+        var allowedChars = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0'];
+
+        // Special characters like äöü don't work with String.fromCharCode
+
+        if (allowedChars.indexOf(String.fromCharCode(e.which).toLowerCase()) != -1) {
+            // UpperCase only for cool retro pixel feeling
+            selectedInput.push(String.fromCharCode(e.which));
+        } else if (e.keyCode == "32") {
+            // Space is also allowed in input fields
+            e.preventDefault();
+            selectedInput.push(" ");
+        }
+
+        // Backspace
+        if (e.keyCode == "8") {
+            e.preventDefault(); // Backspace = Back
+            selectedInput.pop();
+        }
+
+        // Return
+        if (e.keyCode == "13") {
+            // Do this only for the input on start menu
+            if (selectedInput.action == "setName") {
+                sock.emit("setName", selectedInput.submit());
+            }
+        }
+    }
+
     if (e.keyCode == "38" || e.keyCode == "87") {
         sock.emit("presskey", "up");
     }
