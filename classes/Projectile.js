@@ -25,6 +25,7 @@ var Projectile = function (game, pos, target, myWeapon, myOwner) {
         // Move
         var newpos = [this.pos[0]+this.speed[0], this.pos[1]+this.speed[1]];
 
+        /*
         // Collide with terrain
         var col = game.map.checkCollision(newpos, myWeapon.bulletSize)
         if (col[0] || col[1]) {
@@ -52,6 +53,16 @@ var Projectile = function (game, pos, target, myWeapon, myOwner) {
                 }
             }
         }
+        */
+        var hit;
+        if (hit = game.collisionRay(this.pos, newpos, myWeapon.bulletSize)) {
+            if (hit[0]) {
+                return myWeapon.onImpact(hit[0], this);
+            } else {
+                return myWeapon.onImpact(null, this);
+            }
+        };
+        this.pos = newpos;
         return 1;
     }
 

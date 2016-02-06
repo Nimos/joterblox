@@ -66,7 +66,7 @@ var Game = function () {
         // Reset our sound and message queue
         this.sounds = [];
         this.messages = [];
-
+        
         // Iterate over actors to do actor things
         for (var i=0; i<actors.length; i++) {
             if (actors[i].remove) {// remove actor if something flagged it for remove
@@ -126,6 +126,57 @@ var Game = function () {
 
         // Start the game loop
         setInterval(this.update.bind(this), 32);
+    }
+
+    // check for collisions on a path
+    this.collisionRay = function (from, to, size, terrainOnly) {
+        if (!size) size = 0;
+        // get vector to where we're shooting at, normalize it
+        var targetdist = Math.sqrt(Math.pow(from[0]-to[0], 2)+Math.pow(from[1]-to[1], 2));
+        if (targetdist == 0) return false; //if we're not moving, we can't collide
+
+        var direction = [(to[0]-from[0])/targetdist, (to[1]-from[1])/targetdist]
+        
+        // start from where we're shooting from
+        var pos = [from[0], from[1]]
+
+        // and walk a line until we first hit a wall, checking if anyone is in our path...
+        col = this.map.checkCollision(pos, size)
+        while (!col[0] && !col[1]) {
+            pos[0] += direction[0];
+            pos[1] += direction[1];
+
+            var done;
+            if (direction[0] != 0) {
+                done = direction[0] > 0 ? pos[0] > to[0] : pos[0] < to[0];
+            } else if (direction[1] != 0) {
+                done = direction[1] > 0 ? pos[1] > to[1] : pos[1] < to[1];
+            } else {
+                return false;
+            }
+
+            if (done) {
+                return false;
+                break;
+            }
+
+            if (!terrainOnly) {
+                for (var i=0; i<this.actors.length; i++) {
+                    var a = this.actors[i];
+                    if (a.type != "player") continue;
+                    var dist = Math.sqrt(Math.pow(pos[0]-a.pos[0], 2)+Math.pow(pos[1]-a.pos[1], 2))
+                    if (dist < 6) {
+                        if (a.type == "player") {
+                            return [a, null];
+                        }
+                    }
+                }
+            }
+            col = this.map.checkCollision(pos, size)
+        }
+        if (col[0]) pos[0] -= direction[0];
+        if (col[1]) pos[1] -= direction[1];
+        return [null, col, pos];
     }
 }
 
