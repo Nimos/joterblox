@@ -73,7 +73,7 @@ var rainbowAnimation = function () {
 var rainbow = new rainbowAnimation()
 
 // Canvas only input element
-var CanvasInput = function (ctx) {
+var CanvasInput = function (ctx, name) {
     this.ctx = ctx;                 // the context to draw on
     this.name = name;               // Name for checking on submit
     this.x;                         // x-pos of the input text
@@ -454,7 +454,7 @@ document.onkeydown = function (e) {
         // Return
         if (e.keyCode == "13") {
             // Do this only for the input on start menu
-            if (selectedInput.action == "setName") {
+            if (selectedInput.name == "setName") {
                 sock.emit("setName", selectedInput.submit());
             }
         }
