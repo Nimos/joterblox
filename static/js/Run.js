@@ -22,6 +22,9 @@ var hud = {"hp": 0, "ping": 0, "showscreen": 2}
 // Currently selected input field
 var selectedInput = null;
 
+// All inputs on this screen
+var allInputs = [];
+
 // Load resources
 var sounds = {
     "powerup": new Audio("/assets/sounds/powerup.wav"),
@@ -73,49 +76,108 @@ var rainbowAnimation = function () {
 var rainbow = new rainbowAnimation()
 
 // Canvas only input element
-var CanvasInput = function (ctx, name) {
+var CanvasInput = function (ctx, name, x, y, width) {
     this.ctx = ctx;                 // the context to draw on
     this.name = name;               // Name for checking on submit
-    this.x;                         // x-pos of the input text
-    this.y;                         // y-pos of the input text
+    this.x = x;                     // x-pos of the input text
+    this.y = y;                     // y-pos of the input text
+    this.width = width || 200;      // width of the input element in px
 
     this.text = "";                 // value
     this.maxLength = 30;            // maximum length of the input
 
-    this.fontSize = 30;             // font size in pt
+    this.fontSize = 30;             // font size in px
     this.fontFace = "sans-serif";   // font face
     this.color = "black";           // color of the text
-    this.align = "center";          // alignment ("left", "right", "center") - TODO currently only supports center
+    this.align = "center";          // alignment ("left" or "center")
 
-    this.backgroundColor = null;    // color of the background - TODO not implemented yet
-    this.border = false;            // does the input have a border? - TODO not implemented yet
-    this.borderColor = null;        // color of the border - TODO not implemented yet
+    this.padding;                   // padding in px
+    this.backgroundColor = null;    // color of the background (null = no background)
+    this.borderColor = null;        // color of the border (null = no border)
 
-    // Handle selection of multiple inputs on one screen
+
+    // Check if user clicked on an input field
     c.onclick = function(e) {
-        // TODO
-        // is the position of the cursor within the bounds of this input?
-        //      -> get width via maxLength
-        //      -> get height via fontSize
-        // what happens to data from the old input? -> need to call submit() somewhere
-        // selectedInput = this;
+        // Iterate through all inputs and check if cursor was inside for each one
+        // Cursor x has to be between minX and maxX of box
+        // AND    y has to be between minY and maxY of box
+        for (var i=0; i<allInputs.length; i++) {
+            var minX;
+
+            if (allInputs[i].align == "center") {
+                minX = allInputs[i].x - allInputs[i].width / 2 - allInputs[i].padding;
+            } else if (allInputs[i].align == "left") {
+                minX = allInputs[i].x - allInputs[i].padding;
+            }
+
+            var maxX = minX + 2 * allInputs[i].padding + allInputs[i].width;
+            var minY = allInputs[i].y - allInputs[i].fontSize * 0.8 - allInputs[i].padding;
+            var maxY = minY + 2 * allInputs[i].padding + allInputs[i].fontSize;
+
+            // If cursor is inside the coords, the user has clicked the input field.
+            if (minX < cursor[0] && cursor[0] < maxX && minY < cursor[1] && cursor[1] < maxY) {
+                selectedInput = allInputs[i];
+            }
+        }
     };
 
     // Draw this input to the canvas
     this.draw = function() {
-        // Set font properties
+        // corrected x coordinate needed for center align
+        var myX;
+
+        if (this.align == "center") {
+            // Move text to the right to center it
+            // Text will always be centered without considering the trailing "_" or " "
+            // If there is no text the lone underscore will be centered.
+            if (this.text.length == this.maxLength) {
+                myX = this.x;
+            } else if (this.text.length > 0) {
+                // That's 50% of the character width for monospace fonts
+                myX = this.x + 0.275 * this.fontSize;
+            } else {
+                myX = this.x;
+            }
+        } else if (this.align == "left") {
+            myX = this.x;
+        }
+
+        // Draw the background
+        if (this.backgroundColor) {
+            ctx.fillStyle = this.backgroundColor;
+            if (this.align == "center") {
+                ctx.fillRect(this.x - this.width / 2 - this.padding, this.y - this.fontSize * 0.8 - this.padding, 2 * this.padding + this.width, 2 * this.padding + this.fontSize);
+            } else if (this.align == "left") {
+                ctx.fillRect(this.x-this.padding, this.y - this.fontSize * 0.8 - this.padding, 2 * this.padding + this.width, 2 * this.padding + this.fontSize);
+            }
+        }
+
+        // Draw the border
+        if(this.borderColor) {
+            ctx.strokeStyle = this.borderColor;
+            if (this.align == "center") {
+                ctx.strokeRect(c.width / 2 - this.width / 2 - this.padding, this.y - this.fontSize * 0.8 - this.padding, 2 * this.padding + this.width, 2 * this.padding + this.fontSize);
+            } else if (this.align == "left") {
+                ctx.strokeRect(this.x-this.padding, this.y - this.fontSize * 0.8 - this.padding, 2 * this.padding + this.width, 2 * this.padding + this.fontSize);
+            }
+        }
+
+        // Set text properties
         this.ctx.textAlign = this.align;
         this.ctx.font = this.fontSize + "px " + this.fontFace;
         this.ctx.fillStyle = this.color;
 
-        // Display blinking underscore if input is possible, none if maxLength is reached
+        // Draw the text
+        // Display blinking underscore if input is possible and this is selected, none if maxLength is reached
         if (this.text.length == this.maxLength) {
-            ctx.fillText(this.text, this.x, this.y);
+            ctx.fillText(this.text, myX, this.y, this.width);
         } else {
             if (animFrames % 50 > 25 && selectedInput == this) {
-                ctx.fillText(this.text + "_", this.x, this.y);
+                // Now you see me
+                ctx.fillText(this.text + "_", myX, this.y, this.width);
             } else {
-                ctx.fillText(this.text + " ", this.x, this.y);
+                // Now you don't
+                ctx.fillText(this.text + " ", myX, this.y, this.width);
             }
         }
     };
@@ -166,16 +228,27 @@ var drawMenu = function () {
     ctx.drawImage(sprites.cover, 0, 0, 640, 330)
     ctx.drawImage(sprites.covertext, (c.width - sprites.covertext.width) / 2, 350)
 
-    // Input for entering name (You only draw once)
-    if (!selectedInput) {
-        selectedInput = new CanvasInput(ctx, "setName");
-        selectedInput.maxLength = 24;
-        selectedInput.align = "center";
-        selectedInput.fontFace = "monospace";
-        selectedInput.x = c.width/2;
-        selectedInput.y = 450;
+    // Create all inputs if they haven't been created yet.
+    if (allInputs.length == 0) {
+        // Input field for entering the playername
+        // [].push() returns the length of the array, length-1 is the position of the last pushed element
+        var nameinput = allInputs[allInputs.push(new CanvasInput(ctx, "setName", c.width/2, 430, 500))-1];
+        nameinput.maxLength = 24;
+        nameinput.align = "center";
+        nameinput.fontFace = "Monospace";
+        nameinput.fontSize = 30;
+        nameinput.padding = 10;
+        nameinput.backgroundColor = "darkred";
+        nameinput.color = "white";
+
+        // Set nameinput as selected (Autofocus)
+         selectedInput = nameinput;
     }
-    selectedInput.draw();
+
+    // Iterate through all inputs and draw them
+    for (var i=0; i<allInputs.length; i++) {
+        allInputs[i].draw();
+    }
 }
 
 var drawMap = function (ctx, state) {
@@ -453,7 +526,7 @@ document.onkeydown = function (e) {
 
         // Return
         if (e.keyCode == "13") {
-            // Do this only for the input on start menu
+            // Do this action only if the selected input is the setName input
             if (selectedInput.name == "setName") {
                 sock.emit("setName", selectedInput.submit());
             }
