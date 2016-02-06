@@ -10,6 +10,7 @@ var Weapon = function (game, name, owner) {
     // Weapon stats (as reference)
     this.maxAmmo; // Maximum ammo in storage
     this.ammoRecharge; // How many ticks to restore one shot
+    this.fireRate; // How many ticks between shots
     this.bulletSize; // Size of the bullets
     this.bulletSpeed; // Speed of the bullets
     this.bulletGravity; // How fast the bullet fall
@@ -27,6 +28,7 @@ var Weapon = function (game, name, owner) {
         this.bulletSpeed = 25;
         this.bulletGravity = 0;
         this.bulletLife = 5;
+        this.fireRate = 1;
 
         this.bulletColor = "rgb(255,127,0)"
         this.weaponColor = "rgb(255,127,0)"
@@ -47,6 +49,7 @@ var Weapon = function (game, name, owner) {
         this.maxAmmo = 1;
         this.ammo = 1;
         this.ammoRecharge = 30;
+        this.fireRate = 1;
 
         this.bulletSize = 6;
         this.bulletColor = "rgb(0,100,0)"
@@ -82,6 +85,7 @@ var Weapon = function (game, name, owner) {
         this.maxAmmo = 1;
         this.ammo = 1;
         this.ammoRecharge = 100;
+        this.fireRate = 1;
 
         this.bulletSize = 2;
         this.bulletColor = "rgb(0,100,0)"
@@ -130,12 +134,53 @@ var Weapon = function (game, name, owner) {
         this.bulletSpeed = 2;
         this.bulletGravity = 2;
         this.bulletLife = 0;
+    } else if (name == "shotgun") {
+        this.maxAmmo = 5;
+        this.ammo = 5;
+        this.ammoRecharge = 20;
+        this.fireRate = 15;
+
+        this.bulletSize = 5;
+        this.bulletColor = "rgb(20,40,20)"
+        this.weaponColor = "rgb(120,127,120)"
+
+        this.bulletSpeed = 20;
+        this.bulletGravity = 0.5;
+        this.bulletLife = 8;
+
+        this.onImpact = function (target, projectile) {
+            if (target) {
+                target.hp -= 34;
+                if (owner !== target) target.setLastHitBy (owner, "Shotgun");
+            }
+            return 0;
+        };
+
+        this.onShot = function (player, pos, target) {
+            game.sounds.push("shotgun");
+
+            var target = [target[0], target[1]]
+            // Get vector and rotate it
+            var v = [target[0]-pos[0], target[1]-pos[1]]
+            var ca = Math.cos(0.18); // about 10° in rad
+            var sa = Math.sin(0.18);
+            var v1 = [ca*v[0] - sa*v[1], sa*v[0] + ca*v[1]];
+            ca = Math.cos(-0.18); // about -10° in rad
+            sa = Math.sin(-0.18);
+            var v2 = [ca*v[0] - sa*v[1], sa*v[0] + ca*v[1]];
+            
+            target = [pos[0]+v1[0], pos[1]+v1[1]];
+            new Projectile(game, pos, target, this, player);
+            target = [pos[0]+v2[0], pos[1]+v2[1]];
+            new Projectile(game, pos, target, this, player);
+        }
     } else {// Default gun
         this.bulletSpeed = 20;
         this.bulletGravity = 1;
         this.maxAmmo = 5;
         this.ammo = 5;
         this.ammoRecharge = 7;
+        this.fireRate = 3;
 
         this.bulletSize = 4;
         this.bulletColor = "rgb(255,0,0)"
@@ -156,21 +201,24 @@ var Weapon = function (game, name, owner) {
 
     // Start with full magazine after picking up the powerup
     this.ammo = this.maxAmmo;
+    this.cooldown = 0;
 
     // Called by player object to shoot
     this.shoot = function (player, pos, target) {
-        if (this.ammo > 0) {
+        if (this.ammo > 0 && this.cooldown <= 0) {
             if (this.onShot) {
                 this.onShot(player, pos, target);
             }
 
             new Projectile(game, pos, target, this, player);
             this.ammo--;
+            this.cooldown = this.fireRate;
         }
     }
 
     // Called every tick to recharge ammo
     this.updateAmmo = function (shooting) {
+        this.cooldown--;
         // For more than one-shot weapons, don't recharge when shoot button is held
         if (this.maxAmmo != 1 && shooting) return;
         if (this.ammo < this.maxAmmo) {

@@ -28,6 +28,7 @@ var sounds = {
     "normalshot": new Audio("/assets/sounds/normalshot.wav"),
     "flame": new Audio("/assets/sounds/flame.wav"),
     "death": new Audio("/assets/sounds/death.wav"),
+    "shotgun": new Audio("/assets/sounds/shotgun.wav"),
 };
 
 var sprites = {}
@@ -143,8 +144,10 @@ var drawActors = function (ctx, state) {
                 ctx.fillText("F", a.pos[0] - 10, state.map.size[1] - a.pos[1] + 8);
             } else if (a.content == "grenades") {
                 ctx.fillText("G", a.pos[0] - 10, state.map.size[1] - a.pos[1] + 8);
-            } else if (a.content = "laser") {
+            } else if (a.content == "laser") {
                 ctx.fillText("L", a.pos[0] - 10, state.map.size[1] - a.pos[1] + 8);
+            } else if (a.content == "shotgun") {
+                ctx.fillText("S", a.pos[0] - 10, state.map.size[1] - a.pos[1] + 8);
             }
 
 
