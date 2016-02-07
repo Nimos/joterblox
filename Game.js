@@ -9,6 +9,10 @@ app.get('/', function(req, res){
   res.sendFile('index.html', { root: __dirname });
 });
 
+app.get('/editor', function(req, res){
+  res.sendFile('editor.html', { root: __dirname });
+});
+
 app.use('/assets', express.static('assets'));
 app.use('/static', express.static('static'));
 
