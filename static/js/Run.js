@@ -214,20 +214,25 @@ var CanvasInput = function (ctx, name, x, y, width) {
         // Set text properties
         this.ctx.textAlign = this.align;
         this.ctx.font = this.fontSize + "px " + this.fontFace;
-        console.log(this.ctx.font);
         this.ctx.fillStyle = this.color;
+
+        // Correct different baselines of fonts
+        var baselineCorrection = 0;
+        if (this.fontFace == "PressStart2P") {
+            baselineCorrection = this.fontSize*0.25;
+        }
 
         // Draw the text
         // Display blinking underscore if input is possible and this is selected, none if maxLength is reached
         if (this.text.length == this.maxLength) {
-            ctx.fillText(this.text, myX, this.y, this.width);
+            ctx.fillText(this.text, myX, this.y+baselineCorrection, this.width);
         } else {
             if (animFrames % 50 > 25 && selectedInput == this) {
                 // Now you see me
-                ctx.fillText(this.text + "_", myX, this.y, this.width);
+                ctx.fillText(this.text + "_", myX, this.y+baselineCorrection, this.width);
             } else {
                 // Now you don't
-                ctx.fillText(this.text + " ", myX, this.y, this.width);
+                ctx.fillText(this.text + " ", myX, this.y+baselineCorrection, this.width);
             }
         }
     };
@@ -286,7 +291,7 @@ var drawMenu = function () {
         nameinput.maxLength = 20;
         nameinput.align = "center";
         nameinput.fontFace = "PressStart2P";
-        nameinput.fontSize = 28;
+        nameinput.fontSize = 40;
         nameinput.padding = 10;
         nameinput.color = "black";
         nameinput.borderWidth = 3;
