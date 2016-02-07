@@ -1,13 +1,24 @@
 // Only one hardcoded map for now, should be able to load different layouts later
-var Map = function (game) {
+var Map = function (game, mapname) {
     // Defining a map as a size and a set of rectangles
-    this.size = [640,440];
-    this.rects = []
+    this.rects = [];
+    this.size = [0,0];
 
-    this.rects.push([30, 30, 200, 10]);
-    this.rects.push([340, 100, 200, 10]);
-    this.rects.push([100, 200, 200, 10]);
+    this.image = null;
 
+    this.load = function (name) {
+        var m = require("../maps/"+name+".json")
+
+        if (!m.size || !m.rects || !m.image) {
+            return false;
+        }
+
+        this.size = m.size;
+        this.rects = m.rects;
+        this.image = m.image;
+
+        return true;
+    }
 
     // Checks if a block of a size at a position collides with a rectangle or the edges of the map
     // returns collision for both axises seperately
@@ -25,9 +36,9 @@ var Map = function (game) {
         // Rects
         for (var i=0;i<this.rects.length; i++) {
             var rect = this.rects[i];
-            if (pos[0]-size/2 > rect[0]+rect[2] && pos[0]+size/2 < rect[0]) {
+            /*if (pos[0]-size/2 < rect[0]+rect[2] && pos[0]+size/2 > rect[0] && pos[1]+size/2 > rect[1] && pos[1]-size/2 < rect[1]+rect[3]) {
                 collides[0] = true;
-            }
+            }*/
             if (pos[1]-size/2 < rect[1]+rect[3] && pos[1]+size/2 > rect[1] && pos[0]+size/2 > rect[0] && pos[0]-size/2 < rect[0]+rect[2]) {
                 collides[1] = true;
             }         
@@ -35,6 +46,9 @@ var Map = function (game) {
 
         return collides;
     }
+
+    if (!mapname) var mapname = "3lines";
+    this.load(mapname);
 }
 
 module.exports = Map
