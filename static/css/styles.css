@@ -1,6 +1,7 @@
 body {
 	text-align: center;
-	padding:7% 0 0 0;
+	padding:3% 0 0 0;
+	min-width:1290px;
 }
 canvas {
 	border: 3px solid black;

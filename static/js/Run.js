@@ -272,16 +272,16 @@ var drawCursor = function () {
 
 // draw Main menu screen
 var drawMenu = function () {
-    c.width = 640;
-    c.height = 480;
-    sprites.draw(ctx, "/assets/images/cover.jpg", 0, 0, 640, 330);
-    sprites.draw(ctx, "/assets/images/entername.png", (c.width - sprites.get("/assets/images/entername.png").getWidth()) / 2, 350)
+    c.width = 1280;
+    c.height = 720;
+    sprites.draw(ctx, "/assets/images/cover.jpg", 220, 30, 800, 416);
+    sprites.draw(ctx, "/assets/images/entername.png", (c.width - sprites.get("/assets/images/entername.png").getWidth()) / 2, 480)
 
     // Create all inputs if they haven't been created yet.
     if (allInputs.length == 0) {
         // Input field for entering the playername
         // [].push() returns the length of the array, length-1 is the position of the last pushed element
-        var nameinput = allInputs[allInputs.push(new CanvasInput(ctx, "setName", c.width/2, 430, 500))-1];
+        var nameinput = allInputs[allInputs.push(new CanvasInput(ctx, "setName", c.width/2, 590, 500))-1];
         nameinput.maxLength = 20;
         nameinput.align = "center";
         nameinput.fontFace = "Monospace";
