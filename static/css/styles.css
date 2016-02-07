@@ -2,6 +2,13 @@ body {
 	text-align: center;
 	padding:3% 0 0 0;
 	min-width:1290px;
+
+	/* Scale pictures by using nearest-neighbor interpolation for real 8bit feeling */
+	-ms-interpolation-mode: nearest-neighbor; /* Internet Explorer (non-standard property) */
+	image-rendering: -moz-crisp-edges; /* Firefox does not support pixelated (yet) */
+	image-rendering: -webkit-optimize-contrast; /* Safari, equals to crisp-edges (non-standard naming) */
+	image-rendering: pixelated; /* Chrome, Opera */
+
 }
 canvas {
 	border: 3px solid black;
