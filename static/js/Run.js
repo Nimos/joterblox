@@ -141,6 +141,7 @@ var CanvasInput = function (ctx, name, x, y, width) {
     this.padding;                   // padding in px
     this.backgroundColor = null;    // color of the background (null = no background)
     this.borderColor = null;        // color of the border (null = no border)
+    this.borderWidth = 1;           // Border thickness in px
 
 
     // Check if user clicked on an input field
@@ -201,6 +202,7 @@ var CanvasInput = function (ctx, name, x, y, width) {
 
         // Draw the border
         if(this.borderColor) {
+            ctx.lineWidth = this.borderWidth;
             ctx.strokeStyle = this.borderColor;
             if (this.align == "center") {
                 ctx.strokeRect(c.width / 2 - this.width / 2 - this.padding, this.y - this.fontSize * 0.8 - this.padding, 2 * this.padding + this.width, 2 * this.padding + this.fontSize);
