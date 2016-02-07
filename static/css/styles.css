@@ -16,3 +16,8 @@ canvas {
 canvas:hover {
 	cursor: none;
 }
+
+@font-face {
+    font-family: 'PressStart2P';
+    src: url('/assets/PressStart2P.ttf') format('truetype');
+}

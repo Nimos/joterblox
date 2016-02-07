@@ -214,6 +214,7 @@ var CanvasInput = function (ctx, name, x, y, width) {
         // Set text properties
         this.ctx.textAlign = this.align;
         this.ctx.font = this.fontSize + "px " + this.fontFace;
+        console.log(this.ctx.font);
         this.ctx.fillStyle = this.color;
 
         // Draw the text
@@ -284,7 +285,7 @@ var drawMenu = function () {
         var nameinput = allInputs[allInputs.push(new CanvasInput(ctx, "setName", c.width/2, 590, 500))-1];
         nameinput.maxLength = 20;
         nameinput.align = "center";
-        nameinput.fontFace = "Monospace";
+        nameinput.fontFace = "PressStart2P";
         nameinput.fontSize = 28;
         nameinput.padding = 10;
         nameinput.color = "black";
@@ -405,11 +406,11 @@ var drawHUD = function (ctx, hud) {
     ctx.fillRect(0, c.height - 40, c.width, 2)
 
     // Text for HP and Ping
-    ctx.font = "35px Comic Sans MS"
+    ctx.font = "20px PressStart2P"
     ctx.textAlign = "start";
 
     ctx.fillText("HP: " + hud.hp, 2, c.height - 3);
-    ctx.fillText("PING: " + hud.ping, 150, c.height - 3);
+    ctx.fillText("PING: " + hud.ping, 175, c.height - 3);
 
     // Weapon ammo display, if we have one
     if (hud.weapon) {
@@ -449,9 +450,10 @@ var drawDeathScreen = function (ctx, hud) {
     ctx.fillStyle = "black"
     ctx.strokeStyle = "white"
     ctx.textAlign = "center"
-    ctx.font = "50px Comic Sans MS"
+    ctx.font = "35px PressStart2P"
     ctx.fillText("You are dead.", c.width / 2, c.height / 2 - 25);
     ctx.strokeText("You are dead.", c.width / 2, c.height / 2 - 25);
+    ctx.font = "20px PressStart2P"
     if (hud.respawn > 40) {
         ctx.fillText("Press any key to respawn.", c.width / 2, c.height / 2 + 25)
         ctx.strokeText("Press any key to respawn.", c.width / 2, c.height / 2 + 25)
