@@ -3,7 +3,8 @@
     "rects": [
         [30, 30, 200, 10],
         [340, 100, 200, 10],
-        [100, 200, 200, 10],
+        [100, 200, 200, 10]
     ],
-    "image": null
+    "backgroundImage": "/assets/images/shittybg.png",
+    "foregroundImage": "/assets/images/shittyfg.png"
 }

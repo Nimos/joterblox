@@ -36,12 +36,59 @@ var sounds = {
     "shotgun": new Audio("/assets/sounds/shotgun.wav"),
 };
 
-var sprites = {}
-sprites.cover = new Image()
-sprites.cover.src = "/assets/images/cover.jpg"
+// Sprites we want to preload
+var preload = ["/assets/images/cover.jpg", "/assets/images/entername.png", "/assets/images/shittybg.png"]
 
-sprites.covertext = new Image()
-sprites.covertext.src = "/assets/images/entername.png"
+//Class to manage sprites
+var SpriteStorage = function () {
+    var sprites = {};
+
+    // Get a Sprite from cache or create it
+    this.get = function (path) {
+        if (sprites[path]) {
+            return sprites[path];
+        } else {
+            sprites[path] = new Sprite(path);
+            return sprites[path];
+        }
+    }
+
+    // Shortcut to draw a sprite
+    this.draw = function(ctx, path, x, y, x2, y2) {
+        return this.get(path).draw(ctx, x, y, x2, y2);
+    }
+
+    if (preload) {
+        for (var i=0;i<preload.length; i++) {
+            this.get(preload[i]);
+        }
+    }
+
+}
+
+
+
+// Class for Sprites
+var Sprite = function (path) {
+    var image = new Image();
+    image.src = path;
+
+    this.draw = function (ctx, x, y, x2, y2) {
+        if (!x2) x2=image.width;
+        if (!y2) y2=image.height;
+        ctx.drawImage(image, x, y, x2, y2);
+    }
+
+    this.getWidth = function () {
+        return image.width
+    }
+
+    this.getHeight = function () {
+        return image.height
+    }
+}
+
+var sprites = new SpriteStorage(preload);
 
 // Shifting color used for powerups;
 var rainbowAnimation = function () {
@@ -225,8 +272,8 @@ var drawCursor = function () {
 var drawMenu = function () {
     c.width = 640;
     c.height = 480;
-    ctx.drawImage(sprites.cover, 0, 0, 640, 330)
-    ctx.drawImage(sprites.covertext, (c.width - sprites.covertext.width) / 2, 350)
+    sprites.draw(ctx, "/assets/images/cover.jpg", 0, 0, 640, 330);
+    sprites.draw(ctx, "/assets/images/entername.png", (c.width - sprites.get("/assets/images/entername.png").getWidth()) / 2, 350)
 
     // Create all inputs if they haven't been created yet.
     if (allInputs.length == 0) {
@@ -251,7 +298,7 @@ var drawMenu = function () {
     }
 }
 
-var drawMap = function (ctx, state) {
+var drawMapBG = function (ctx, state) {
     c.width = state.map.size[0];
     c.height = state.map.size[1] + 40;
 
@@ -260,6 +307,17 @@ var drawMap = function (ctx, state) {
         ctx.fillStyle = "black";
         ctx.fillRect(r[0], state.map.size[1] - r[1] - r[3], r[2], r[3])
     }
+
+    if (state.map.backgroundImage) {
+        sprites.draw(ctx,state.map.backgroundImage, 0,0);
+    }
+    
+}
+
+var drawMapFG = function (ctx, state) {
+     if (state.map.foregroundImage) {
+        sprites.draw(ctx,state.map.foregroundImage, 0,0);
+    }   
 }
 
 var drawActors = function (ctx, state) {
@@ -449,9 +507,9 @@ var handleUpdate = function (s) {
     // And the many things that are about drawing...
 
     // draw the game
-    drawMap(ctx, state);
+    drawMapBG(ctx, state);
     drawActors(ctx, state);
-
+    drawMapFG(ctx,state);
     // draw the hud
     drawHUD(ctx, hud);
 

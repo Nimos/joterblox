@@ -4,18 +4,22 @@ var Map = function (game, mapname) {
     this.rects = [];
     this.size = [0,0];
 
-    this.image = null;
+    this.backgroundImage = null;
+    this.foregroundImage = null;
 
     this.load = function (name) {
         var m = require("../maps/"+name+".json")
 
-        if (!m.size || !m.rects || !m.image) {
+        if (!m.size || !m.rects) {
             return false;
         }
 
+        console.log(m)
+
         this.size = m.size;
         this.rects = m.rects;
-        this.image = m.image;
+        this.backgroundImage = m.backgroundImage;
+        this.foregroundImage = m.foregroundImage;
 
         return true;
     }
