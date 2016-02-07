@@ -655,12 +655,6 @@ document.onkeyup = function (e) {
     }
 };
 
-// change/set name
-nameclick.onclick = function (e) {
-    sock.emit("setName", nameinput.value)
-    stopEvent(e);
-};
-
 // change/set color
 colorclick.onclick = function (e) {
     sock.emit("setColor", [c1.value, c2.value, c3.value])
