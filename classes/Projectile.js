@@ -57,7 +57,7 @@ var Projectile = function (game, pos, target, myWeapon, myOwner) {
         var hit;
         if (hit = game.collisionRay(this.pos, newpos, myWeapon.bulletSize)) {
             if (hit[0]) {
-                return myWeapon.onImpact(hit[0], this);
+                if (hit[0] !== myOwner || lifeFrames > 4) return myWeapon.onImpact(hit[0], this);
             } else {
                 return myWeapon.onImpact(null, this);
             }

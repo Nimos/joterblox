@@ -70,10 +70,13 @@ var Weapon = function (game, name, owner) {
             for (var i=0; i<game.actors.length; i++) {
                 var a = game.actors[i];
                 if (a.type != "player") continue;
+                var vec = [a.pos[0]-projectile.pos[0], a.pos[1]-projectile.pos[1]]
                 var dist = Math.sqrt(Math.pow(projectile.pos[0]-a.pos[0], 2)+Math.pow(projectile.pos[1]-a.pos[1], 2))
                 if (dist < 5+60) {
                     if (a.type == "player") {
                         a.hp -= 50;
+                        a.speed[0] += vec[0]/(dist/40);
+                        a.speed[1] += vec[1]/(dist/20); 
                         if (owner !== a) a.setLastHitBy (owner, "Grenade");
                     }
                 }
@@ -150,7 +153,7 @@ var Weapon = function (game, name, owner) {
 
         this.onImpact = function (target, projectile) {
             if (target) {
-                target.hp -= 34;
+                target.hp -= 50;
                 if (owner !== target) target.setLastHitBy (owner, "Shotgun");
             }
             return 0;
