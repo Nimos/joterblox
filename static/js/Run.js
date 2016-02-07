@@ -280,13 +280,14 @@ var drawMenu = function () {
         // Input field for entering the playername
         // [].push() returns the length of the array, length-1 is the position of the last pushed element
         var nameinput = allInputs[allInputs.push(new CanvasInput(ctx, "setName", c.width/2, 430, 500))-1];
-        nameinput.maxLength = 24;
+        nameinput.maxLength = 20;
         nameinput.align = "center";
         nameinput.fontFace = "Monospace";
-        nameinput.fontSize = 30;
+        nameinput.fontSize = 28;
         nameinput.padding = 10;
-        nameinput.backgroundColor = "darkred";
-        nameinput.color = "white";
+        nameinput.color = "black";
+        nameinput.borderWidth = "3";
+        nameinput.borderColor = "black";
 
         // Set nameinput as selected (Autofocus)
          selectedInput = nameinput;
