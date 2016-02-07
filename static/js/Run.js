@@ -288,7 +288,7 @@ var drawMenu = function () {
         nameinput.fontSize = 28;
         nameinput.padding = 10;
         nameinput.color = "black";
-        nameinput.borderWidth = "3";
+        nameinput.borderWidth = 3;
         nameinput.borderColor = "black";
 
         // Set nameinput as selected (Autofocus)

@@ -1,8 +1,9 @@
 body {
 	text-align: center;
+	padding:9% 0 0 0;
 }
 canvas {
-	border: 1px solid black;
+	border: 3px solid black;
 }
 canvas:hover {
 	cursor: none;
