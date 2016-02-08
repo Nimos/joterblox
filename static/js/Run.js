@@ -411,7 +411,7 @@ var drawHUD = function (ctx, hud) {
     ctx.fillRect(0, c.height - 40, c.width, 2)
 
     // Text for HP and Ping
-    ctx.font = "20px PressStart2P"
+    ctx.font = "24px PressStart2P"
     ctx.textAlign = "start";
 
     ctx.fillText("HP: " + hud.hp, 2, c.height - 3);
@@ -455,10 +455,10 @@ var drawDeathScreen = function (ctx, hud) {
     ctx.fillStyle = "black"
     ctx.strokeStyle = "white"
     ctx.textAlign = "center"
-    ctx.font = "35px PressStart2P"
+    ctx.font = "40px PressStart2P"
     ctx.fillText("You are dead.", c.width / 2, c.height / 2 - 25);
     ctx.strokeText("You are dead.", c.width / 2, c.height / 2 - 25);
-    ctx.font = "20px PressStart2P"
+    ctx.font = "24px PressStart2P"
     if (hud.respawn > 40) {
         ctx.fillText("Press any key to respawn.", c.width / 2, c.height / 2 + 25)
         ctx.strokeText("Press any key to respawn.", c.width / 2, c.height / 2 + 25)
