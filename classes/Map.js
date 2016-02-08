@@ -1,3 +1,4 @@
+var settings = require("../settings");
 // Only one hardcoded map for now, should be able to load different layouts later
 var Map = function (game, mapname) {
     // Defining a map as a size and a set of rectangles
@@ -48,7 +49,7 @@ var Map = function (game, mapname) {
 
         return collides;
     }
-    if (!mapname) var mapname = "3lines";
+    if (!mapname) var mapname = settings.map.fallbackMap;
     this.load(mapname);
 }
 

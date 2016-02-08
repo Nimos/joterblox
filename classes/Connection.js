@@ -1,5 +1,6 @@
 var Player = require("./Player")
 var adds = [];
+var settings = require("../settings");
 
 var Connection = function (game, socket) {
     // Track Controls
@@ -35,7 +36,7 @@ var Connection = function (game, socket) {
     // Things to do regularily
     this.update = function () {
         // Send a ping every ~2.5 seconds
-        pingticks %= 100;
+        pingticks %= settings.playerConnection.pingInterval;
         if (pingticks++ == 0) {
             if (pingWaiting) {
                 game.messages.push(name +" timed out.");
@@ -85,8 +86,8 @@ var Connection = function (game, socket) {
         
         // No empty names
         if (!name || name == "") {
-            name = "Unnamed Block";
-            self.name = "Unnamed Block";
+            name = settings.playerConnection.defaultName;
+            self.name = name;
         }
 
         // Spawn
@@ -99,7 +100,7 @@ var Connection = function (game, socket) {
     // Add socket listeners, mostly self explanatory
     var self = this;
     socket.on('setName', function(n){
-        n = n.substring(0,24);
+        n = n.substring(0,settings.playerConnection.maxNameLength);
         name = n;
         self.name = n;
         spawnPlayer();
@@ -109,7 +110,7 @@ var Connection = function (game, socket) {
         keys[key] = true;
 
         // (for "press any key to respawn")
-        if (player && !player.active && respawnFrames >= 40) {
+        if (player && !player.active && respawnFrames >= settings.playerConnection.respawnDelay) {
             spawnPlayer();
         }
     });

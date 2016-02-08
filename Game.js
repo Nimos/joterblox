@@ -13,11 +13,17 @@ app.get('/editor', function(req, res){
   res.sendFile('editor.html', { root: __dirname });
 });
 
+app.get('/settings', function(req, res) {
+    res.send("var settings = "+JSON.stringify(settings));
+});
+
 app.use('/assets', express.static('assets'));
 app.use('/static', express.static('static'));
 
-http.listen(3000, function(){
-  console.log('listening on *:3000');
+var settings = require("./settings");
+
+http.listen(settings.gameServer.port, function(){
+  console.log('listening on *:'+settings.gameServer.port);
 });
 
 // Import stuff
@@ -27,10 +33,10 @@ var Player = require("./classes/Player")
 var Connection = require("./classes/Connection")
 
 // List maps here
-var maps = ["3lines", "smash"]
+var maps = settings.gameServer.randomMapList;
 
 // Round Timer in seconds
-var roundtimer = 120;
+var roundtimer = settings.gameServer.roundTimer;
 
 
 // Main class to do things in
@@ -111,7 +117,7 @@ var Game = function () {
         // Add a new powerup every 100 ticks, up to maximum of 3
         powerupcounter %= 100;
         if (powerupcounter++ == 0) {
-            if (this.powerups < 3) {
+            if (this.powerups < settings.gameServer.maxPowerups) {
                 this.powerups++;
                 new Powerup(this);
             }
@@ -191,7 +197,7 @@ var Game = function () {
                     var a = this.actors[i];
                     if (a.type != "player") continue;
                     var dist = Math.sqrt(Math.pow(pos[0]-a.pos[0], 2)+Math.pow(pos[1]-a.pos[1], 2))
-                    if (dist < 6) {
+                    if (dist < (settings.player.hitBoxSize/2 + size/2)) {
                         if (a.type == "player") {
                             return [a, null];
                         }

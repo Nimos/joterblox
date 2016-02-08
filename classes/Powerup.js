@@ -1,7 +1,9 @@
+var settings = require("../settings");
+
 // Powerup class
 var Powerup = function (game) {
     // Possible powerup types
-    types = ["laser", "grenades", "flamethrower","shotgun"];
+    types = settings.powerup.types;
     // Pick random powerup type
     this.content = types[Math.floor(Math.random()*types.length)]
 

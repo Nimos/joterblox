@@ -1,14 +1,16 @@
 Weapon = require("./Weapon")
+var settings = require("../settings");
 
 // Class for the player actor in the game
 var Player = function (game, connection, name, color) {
     // Attributes I might want to tweak
-    var maxhp = 100;
-    var speedcap = 10;
-    var hacceleration = 5;
-    var hdeceleration = 5;
-    var jumpspeed = 20;
-    var gravity = 2;
+    var maxhp = settings.player.maxHP;
+    var speedcap = settings.player.speedCap;
+    var hacceleration = settings.player.hacceleration;
+    var hdeceleration = settings.player.hdeceleration;
+    var jumpspeed = settings.player.jumpSpeed;
+    var gravity = settings.player.gravity;
+    var size = settings.player.hitBoxSize;
     
     // Customizations
     this.name = name;
@@ -88,7 +90,7 @@ var Player = function (game, connection, name, color) {
         // Calculate new position based on what happened before..
         var newpos = [this.pos[0]+this.speed[0], this.pos[1]+this.speed[1]];
 
-        hit = game.playerCollision(this.pos, newpos, 10)
+        hit = game.playerCollision(this.pos, newpos, size)
         if (hit[0]) {
             this.pos = hit[1];
         } else {

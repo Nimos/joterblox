@@ -1,16 +1,16 @@
 // Settings for the bottom bar
-var bottomHudHeight = 54;
-var hudBarWidth = 300;
-var hudBarHeight = 16;
-var hudAmmoColor1 = "rgb(229, 103, 21)";
-var hudAmmoColor2 = "rgb(164, 84, 11)";
-var hudReloadColor1 = "rgb(70, 165, 215)";
-var hudReloadColor2 = "rgb(55, 128, 161)";
-var hudInactiveColor = "rgb(50,50,50)";
-var hudHpColor1 =  "rgb(18, 170, 83)";
-var hudHpColor2 = hudInactiveColor;
-var hudBarTextColor = "#fff";
-var hudBarFont = "16px PressStart2P"
+var bottomHudHeight = settings.client.bottomHudHeight;
+var hudBarWidth = settings.client.hudBarWidth;
+var hudBarHeight = settings.client.hudBarHeight;
+var hudAmmoColor1 = settings.client.hudAmmoColor1;
+var hudAmmoColor2 = settings.client.hudAmmoColor2;
+var hudReloadColor1 = settings.client.hudReloadColor1;
+var hudReloadColor2 = settings.client.hudReloadColor2;
+var hudInactiveColor = settings.client.hudInactiveColor;
+var hudHpColor1 = settings.client.hudHpColor1;
+var hudHpColor2 = settings.client.hudHpColor2;
+var hudBarTextColor = settings.client.hudBarTextColor;
+var hudBarFont = settings.client.hudBarFont;
 
 
 // Get rendering context
@@ -293,8 +293,8 @@ var drawCursor = function () {
 
 // draw Main menu screen
 var drawMenu = function () {
-    c.width = 1280;
-    c.height = 720;
+    c.width = settings.client.mainMenuWidth;
+    c.height = settings.client.mainMenuHeight;
     sprites.draw(ctx, "/assets/images/cover.jpg", 220, 30, 800, 416);
     sprites.draw(ctx, "/assets/images/entername.png", (c.width - sprites.get("/assets/images/entername.png").getWidth()) / 2, 480)
 
@@ -348,13 +348,14 @@ var drawActors = function (ctx, state) {
     for (var i = 0; i < state.actors.length; i++) {
         var a = state.actors[i];
         if (a.type == "player") {
+            var pSize = settings.player.hitBoxSize;
             // Draw Player
             // Edges by weapon color
             ctx.fillStyle = a.weapon.weaponColor;
-            ctx.fillRect(a.pos[0] - 5, state.map.size[1] - a.pos[1] - 5, 10, 10)
+            ctx.fillRect(a.pos[0] - pSize/2, state.map.size[1] - a.pos[1] - pSize/2, pSize, pSize)
             // Center by player color
             ctx.fillStyle = "rgb(" + a.color[0] + "," + a.color[1] + "," + a.color[2] + ")";
-            ctx.fillRect(a.pos[0] - 3, state.map.size[1] - a.pos[1] - 3, 6, 6)
+            ctx.fillRect(a.pos[0] - pSize/3, state.map.size[1] - a.pos[1] - pSize/3, 2*pSize/3, 2*pSize/3)
 
             ctx.textAlign = "center";
             ctx.font = "10px sans-serif"
