@@ -23,5 +23,6 @@
 		[0,-1,1004,7]
 	],
 	"backgroundImage": "/assets/images/akirabg.png",
-	"foregroundImage": "/assets/images/akirafg.png"
+	"foregroundImage": "/assets/images/akirafg.png",
+	"bounds": [1,0,0,0]
 }
