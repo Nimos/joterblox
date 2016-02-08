@@ -205,6 +205,72 @@ var Game = function () {
         return [null, col, pos];
     }
 
+
+    // playerCollision
+    this.playerCollision = function (from, to, size) {
+      if (!size) size = 0;
+        
+        if (to[0]-from[0] > 0) {
+            var stepX = 1;
+        } else if (to[0]-from[0] < 0) {
+            var stepX = -1;
+        } else {
+            var stepX = 0;
+        }
+
+        if (to[1]-from[1] > 0) {
+            var stepY = 1;
+        } else if (to[1]-from[1] < 0) {
+            var stepY = -1;
+        } else {
+            var stepY = 0;
+        }
+
+        // start from where we're shooting from
+        var pos = [from[0], from[1]]
+
+        var colX = false;
+        var col = this.map.checkCollision(pos, size)
+        while (!col[0] && !col[1]) {
+            if (stepX > 0 && pos[0] >= to[0]) {
+                break;
+            } else if (stepX < 0 && pos[0] <= to[0]) {
+                break;
+            } else if (stepX == 0) {
+                break
+            }
+
+            pos[0] += stepX;
+            col = this.map.checkCollision(pos, size)
+            if (col[0] || col[1]) {
+                colX = true;
+                pos[0] -= stepX;
+                break;
+            }
+        }
+        var colY = false;
+        var col = this.map.checkCollision(pos, size)
+        while (!col[0] && !col[1]) {
+            if (stepY > 0 && pos[1] >= to[1]) {
+                break;
+            } else if (stepY < 0 && pos[1] <= to[1]) {
+                break;
+            } else if (stepY == 0) {
+                break
+            }
+
+            pos[1] += stepY;
+            col = this.map.checkCollision(pos, size)
+            if (col[0] || col[1]) {
+                colY = true;
+                pos[1] -= stepY;
+                break;
+            }
+        }
+
+        return [(colX || colY), pos, [colX,colY]];
+    }
+
     var game = this;
 
     // Add the listeners for new connections

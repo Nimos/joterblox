@@ -89,20 +89,25 @@ var Player = function (game, connection, name, color) {
         var newpos = [this.pos[0]+this.speed[0], this.pos[1]+this.speed[1]];
 
         // ..and check collision for new position
-        var col = game.map.checkCollision(newpos, 10)
+        //var col = game.map.checkCollision(newpos, 10)
 
+        hit = game.playerCollision(this.pos, newpos, 10)
+        if (hit[0]) {
+            this.pos = hit[1];
+        } else {
+            this.pos = newpos;
+        }
+        
         // stop moving on the axis we're colliding on
+        col = hit[2];
         if (col[0]) {
             this.speed[0] = 0;
-        } else {
-            this.pos[0] = newpos[0];
         }
 
         if (col[1]) {
             this.state = 0;
             this.speed[1] = 0;
         } else {
-            this.pos[1] = newpos[1];
             this.state = JUMPING;
         }
 
