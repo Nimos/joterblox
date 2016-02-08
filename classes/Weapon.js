@@ -122,6 +122,7 @@ var Weapon = function (game, name, owner) {
                         }
                     }
                 }
+                if (game.map.checkBounds(pos, 2)) break;
                 col = game.map.checkCollision(pos, 2)
             }
 

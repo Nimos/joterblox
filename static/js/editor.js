@@ -20,8 +20,8 @@ var setImage = function (dataurl) {
   width = i.width;
   height = i.height;
 
-  c.width = width;
-  c.height = height;
+  c.width = width+4;
+  c.height = height+4;
 }
 
 
@@ -50,15 +50,27 @@ var previewRekt = [0,0,0,0];
 // Draw rects and everything
 var draw = function () {
   ctx.clearRect(0,0,c.width, c.height)
-  if (image) ctx.drawImage(image, 0,0);
+  if (image) ctx.drawImage(image, 2,2);
   ctx.fillStyle = pt;
   for (var i=0; i<rects.length; i++) {
     var r = rects[i];
-    ctx.fillRect(r[0], r[1], r[2], r[3])
+    ctx.fillRect(r[0]+2, r[1]+2, r[2], r[3])
   }
   var r = previewRekt
   ctx.fillRect(r[0], r[1], r[2], r[3])
+  var fs = ["#000", "#00F", "#F00"]
+  ctx.fillStyle = fs[bs0.value];
+  ctx.fillRect(0,0,c.width,2);
+  ctx.fillStyle = fs[bs1.value];
+  ctx.fillRect(c.width-2,0,2,c.height);
+  ctx.fillStyle = fs[bs2.value];
+  ctx.fillRect(0,c.height-2,c.width,2);
+  ctx.fillStyle = fs[bs3.value];
+  ctx.fillRect(0,0,2,c.height);
+
   drawCursor();
+
+  generateResult();
   requestAnimationFrame(draw);
 }
 
@@ -99,7 +111,7 @@ c.addEventListener("mouseup", function(e){
     var rectsize = [end[0]-start[0], end[1]-start[1]]
     previewRekt = [0,0,0,0];
     if(dragging === 1 && Math.abs(rectsize[0]) > 1 && Math.abs(rectsize[1]) > 1){
-        rects.push([start[0], start[1], rectsize[0], rectsize[1]]);
+        rects.push([start[0]-2, start[1]-2, rectsize[0], rectsize[1]]);
         generateResult();
     }
     dragging= -1;
@@ -136,6 +148,7 @@ var generateResult = function () {
   result += "\n\t],\n";
   result += "\t\"backgroundImage\": \"\",\n"
   result += "\t\"foregroundImage\": \"\"\n"
+  result += "\t\"bounds\": ["+bs0.value+","+bs1.value+","+bs2.value+","+bs3.value+"],\n"
   result += "}"
 
   document.getElementById('result').value = result;

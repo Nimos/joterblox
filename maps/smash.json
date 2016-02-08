@@ -13,5 +13,6 @@
 		[26,297,95,29]
 	],
 	"backgroundImage": "/assets/images/smash.png",
-	"foregroundImage": ""
+	"foregroundImage": "",
+	"bounds": [1,0,2,0]
 }
