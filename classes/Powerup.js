@@ -12,6 +12,7 @@ var Powerup = function (game) {
     // but always move down to the first ground    
     while (!game.map.checkCollision(this.pos, 20)[1] && !game.map.checkCollision(this.pos, 20)[0]) {
         this.pos[1]--;
+        if (game.map.checkBounds(this.pos, 20)) break;
     }
 
     this.active = true;

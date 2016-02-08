@@ -110,6 +110,8 @@ var Player = function (game, connection, name, color) {
             this.state = JUMPING;
         }
 
+        game.map.checkBounds(this.pos, size, this);
+
         // die if we're dead
         if (this.hp <= 0) {
             // output kill message
