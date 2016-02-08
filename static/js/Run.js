@@ -612,9 +612,14 @@ var drawScoreboard = function (ctx, state) {
     ctx.fillStyle = "black";
     ctx.textAlign = "start";
     ctx.font = "15px sans-serif";
+    var n = 0;
     for (var i = 0; i < scoreboard.length; i++) {
         s = scoreboard[i];
-        ctx.fillText((i + 1) + ". " + s.name + ": " + s.score + " points (" + s.ping + " ms)", 105, 115 + i * 20);
+        if (s.joined) {
+            ctx.fillText((i-n + 1) + ". " + s.name + ": " + s.score + " points (" + s.ping + " ms)", 105, 115 + (i-n) * 20);
+        } else {
+            n++;
+        }
     }
 }
 
