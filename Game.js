@@ -229,6 +229,8 @@ var Game = function () {
         // start from where we're shooting from
         var pos = [from[0], from[1]]
 
+
+        // move horizontally
         var colX = false;
         var col = this.map.checkCollision(pos, size)
         while (!col[0] && !col[1]) {
@@ -248,6 +250,8 @@ var Game = function () {
                 break;
             }
         }
+
+        // move vertically
         var colY = false;
         var col = this.map.checkCollision(pos, size)
         while (!col[0] && !col[1]) {

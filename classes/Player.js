@@ -88,9 +88,6 @@ var Player = function (game, connection, name, color) {
         // Calculate new position based on what happened before..
         var newpos = [this.pos[0]+this.speed[0], this.pos[1]+this.speed[1]];
 
-        // ..and check collision for new position
-        //var col = game.map.checkCollision(newpos, 10)
-
         hit = game.playerCollision(this.pos, newpos, 10)
         if (hit[0]) {
             this.pos = hit[1];
