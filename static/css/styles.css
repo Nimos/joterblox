@@ -3,7 +3,7 @@ body {
 	padding:3% 0 0 0;
 	min-width:1290px;
 	background-color:black;
-
+	color:white;
 	/* Scale pictures by using nearest-neighbor interpolation for real 8bit feeling */
 	-ms-interpolation-mode: nearest-neighbor; /* Internet Explorer (non-standard property) */
 	image-rendering: -moz-crisp-edges; /* Firefox does not support pixelated (yet) */
