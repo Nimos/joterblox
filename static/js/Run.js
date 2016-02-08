@@ -276,6 +276,69 @@ var CanvasInput = function (ctx, name, x, y, width) {
     }
 };
 
+var PingDisplay = function(ctx, x, y, size, showText) {
+    // Coordinate origin is bottom left (thanksmos)
+    this.x = x;
+    this.y = y;
+    this.size = size; // height of the first bar in px (0.25*height of fourth bar)
+    this.showText = showText || false; // Show ping in ms next to the bars?
+
+    this.lineWidth = 2; // How thick is the outline (2 seems to be good)
+
+    // Call this to draw me
+    this.draw = function() {
+        // Set the color based on the range the ping is in
+        if (hud.ping < settings.pingDisplay.ranges[2]) {
+            this.color = settings.pingDisplay.colors[3];
+        } else if (hud.ping < settings.pingDisplay.ranges[1]) {
+            this.color = settings.pingDisplay.colors[2];
+        } else if (hud.ping < settings.pingDisplay.ranges[0]) {
+            this.color = settings.pingDisplay.colors[1];
+        } else {
+            this.color = settings.pingDisplay.colors[0];
+        }
+
+        // Prepare font, stroke and fill properties
+        ctx.font = 4 * this.size + "px PressStart2P";
+        ctx.lineWidth = this.lineWidth;
+        ctx.strokeStyle = "black";
+        ctx.fillStyle = this.color;
+
+        // Outlines
+        ctx.strokeRect(this.x + 0 * this.size * 1.5, c.height - this.y - this.size - this.size * 0, this.size * 0.9, 1 * this.size);
+        ctx.strokeRect(this.x + 1 * this.size * 1.5, c.height - this.y - this.size - this.size * 1, this.size * 0.9, 2 * this.size);
+        ctx.strokeRect(this.x + 2 * this.size * 1.5, c.height - this.y - this.size - this.size * 2, this.size * 0.9, 3 * this.size);
+        ctx.strokeRect(this.x + 3 * this.size * 1.5, c.height - this.y - this.size - this.size * 3, this.size * 0.9, 4 * this.size);
+
+        // Always fill first bar (Even if ping is 35836983590 years)
+            ctx.fillRect(this.x + 0 * this.size * 1.5, c.height - this.y - this.size - this.size * 0, this.size * 0.9, 1 * this.size);
+
+        // Fill second bar if ping is lower than worst
+        if (hud.ping < settings.pingDisplay.ranges[0]) { //
+            ctx.fillRect(this.x + 1 * this.size * 1.5, c.height - this.y - this.size - this.size * 1, this.size * 0.9, 2 * this.size);
+        }
+
+        // Fill third bar if ping is okay but not perfect
+        if (hud.ping < settings.pingDisplay.ranges[1]) {
+            ctx.fillRect(this.x + 2 * this.size * 1.5, c.height - this.y - this.size - this.size * 2, this.size * 0.9, 3 * this.size);
+        }
+
+        // Fill fourth bar if ping is really good
+        if (hud.ping < settings.pingDisplay.ranges[2]) {
+            ctx.fillRect(this.x + 3 * this.size * 1.5, c.height - this.y - this.size - this.size * 3, this.size * 0.9, 4 * this.size);
+        }
+
+        // Write ping in ms right to the bars
+        if (this.showText) {
+            ctx.textAlign = "left";
+            ctx.strokeStyle = "black";
+            ctx.strokeText(hud.ping, this.x + 5 * this.size * 1.5, c.height - this.y);
+            ctx.fillStyle = this.color;
+            ctx.fillText(hud.ping, this.x + 5 * this.size * 1.5, c.height - this.y);
+        }
+    }
+};
+
 // Frame counter to base animations on
 var animFrames = 0;
 
@@ -430,8 +493,8 @@ var drawHUD = function (ctx, hud) {
     ctx.font = "16px PressStart2P"
     ctx.textAlign = "start";
 
-    
-    ctx.fillText("PING: " + hud.ping, 2, c.height - 3);
+    var ping = new PingDisplay(ctx, 10, 10, 4, true);
+    ping.draw();
 
     //HP Bar
     ctx.fillStyle = hudHpColor2;
