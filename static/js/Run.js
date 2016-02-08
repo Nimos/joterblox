@@ -627,6 +627,11 @@ c.onmouseup = function (e) {
     stopEvent(e);
 }
 
+// dont show context menu
+c.oncontextmenu = function (e) {
+    stopEvent(e);
+}
+
 // all kinds of keys
 document.onkeydown = function (e) {
     // Do this if an input element is focused
