@@ -30,13 +30,15 @@ canvas:hover {
 	color: white;
 	border-style: solid;
 	border-width: 2px;
-	border-color: #79c0db #79c0db #316886 #316886;
+	border-color: #79c0db #316886 #316886 #79c0db;
 	margin:0 25px;
+	box-shadow: 3px 3px 0 black;
 }
 .link-button:active{
 	background-color:#377998 !important;
-	border-color: #2f5a77 #2f5a77 #5590aa #5590aa !important;
-	text-shadow:-2px -2px 0 #244056;
+	border-color: #273c54 #5590aa #5590aa #273c54 !important;
+	text-shadow:none;
+	box-shadow:none;
 }
 .link-button:active span{
 	position:relative;
