@@ -14,8 +14,6 @@ var Map = function (game, mapname) {
             return false;
         }
 
-        console.log(m)
-
         this.size = m.size;
         this.rects = m.rects;
         this.backgroundImage = m.backgroundImage;
@@ -50,7 +48,6 @@ var Map = function (game, mapname) {
 
         return collides;
     }
-
     if (!mapname) var mapname = "3lines";
     this.load(mapname);
 }

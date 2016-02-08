@@ -134,19 +134,19 @@ var Game = function () {
     this.init = function (map) {
         console.log("[Game] Starting a new round");
         if (!map) {
-            map = maps[Math.floor(Math.random()*(maps.length+1))]
+            map = maps[Math.floor(Math.random()*maps.length)]
         }
 
-        this.map = new Map(map);
+        this.map = new Map(this, map);
         actors = [];
         this.actors = actors;
         powerupcounter = 0;
         
         this.sounds = [];
         this.messages = [];
-        this.map = new Map();
         this.powerups = 0;
-        for (var i, c;i<connections.length;c=connections[i++]) {
+        for (var i=0;i<connections.length;i++) {
+            c = connections[i];
             c.reset();
         }
         this.state = 1;

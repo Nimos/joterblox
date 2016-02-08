@@ -79,6 +79,7 @@ var Connection = function (game, socket) {
 
     // Spawn/Respawn
     var spawnPlayer = function () {
+        console.log(player);
         // Don't spawn 2 players
         if (player && player.active) return;
         
