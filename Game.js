@@ -26,6 +26,12 @@ var Powerup = require("./classes/Powerup")
 var Player = require("./classes/Player")
 var Connection = require("./classes/Connection")
 
+// List maps here
+var maps = ["3lines", "smash"]
+
+// Round Timer in seconds
+var roundtimer = 120;
+
 
 // Main class to do things in
 var Game = function () {
@@ -52,6 +58,12 @@ var Game = function () {
     // Sounds and messages for the clients to play/display on the next update
     this.sounds = [];
     this.messages = [];
+
+    // 1: RUNNING, 0: WAITING
+    this.state = 0;
+
+    // store when last round was started
+    this.roundStart = 0;
 
     // Names are self explanatory
     this.addActor = function (obj) {
@@ -118,18 +130,28 @@ var Game = function () {
         if (tickTime > 10) console.log("[Warning] Long tick time:", tickTime, "ms");
     }
 
-    // idk why this isn't part of the constructor
-    this.init = function () {
-        var game = this;
+    // starts a new round
+    this.init = function (map) {
+        console.log("[Game] Starting a new round");
+        if (!map) {
+            map = maps[Math.floor(Math.random()*(maps.length+1))]
+        }
 
-        // Add the listeners for new connections
-        io.on('connection', function(socket){
-            console.log('[Info] New player');
-            new Connection(game, socket)
-        });
-
-        // Start the game loop
-        setInterval(this.update.bind(this), 32);
+        this.map = new Map(map);
+        actors = [];
+        this.actors = actors;
+        powerupcounter = 0;
+        
+        this.sounds = [];
+        this.messages = [];
+        this.map = new Map();
+        this.powerups = 0;
+        for (var i, c;i<connections.length;c=connections[i++]) {
+            c.reset();
+        }
+        this.state = 1;
+        this.roundStart = (new Date).getTime();
+        setTimeout(this.init.bind(this), roundtimer*1000)
     }
 
     // check for collisions on a path
@@ -182,6 +204,17 @@ var Game = function () {
         if (col[1]) pos[1] -= direction[1];
         return [null, col, pos];
     }
+
+    var game = this;
+
+    // Add the listeners for new connections
+    io.on('connection', function(socket){
+        console.log('[Info] New player');
+        new Connection(game, socket)
+    });
+
+    // Start the game loop
+    setInterval(this.update.bind(this), 32);
 }
 
 // Start the Game

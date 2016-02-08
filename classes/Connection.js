@@ -51,11 +51,13 @@ var Connection = function (game, socket) {
             }
         }
 
+        var now = (new Date).getTime();
+
         // Update player's screen with hud info
         if (player && player.active) { // User is in the Game, show game screen
-            socket.emit("hud", {"screen": 0, "hp": player.hp, "ping": this.ping, "weapon": player.weapon, "playerX": player.pos[0], "playerY": player.pos[1], "playerColor": player.color})
+            socket.emit("hud", {"screen": 0, "hp": player.hp, "ping": this.ping, "weapon": player.weapon, "playerX": player.pos[0], "playerY": player.pos[1], "playerColor": player.color, "timeRemaining": game.roundStart+120000-now})
         } else if (player && !player.active) { // User is dead, show respawn screen
-            socket.emit("hud", {"screen": 1, "hp": 0, "ping": this.ping, "respawn": respawnFrames++})
+            socket.emit("hud", {"screen": 1, "hp": 0, "ping": this.ping, "respawn": respawnFrames++, "timeRemaining": game.roundStart+120000-now})
         } else { // User has not joined yet, show menu
             socket.emit("hud", {"screen": 2, "hp": 0, "ping": this.ping, "weapon": null})
         }
@@ -64,6 +66,14 @@ var Connection = function (game, socket) {
         if (!connected) return 0;
 
         return 1;
+    }
+
+    // Called when a round is restarted
+    this.reset = function () {
+        player = null;
+        this.score = 0;
+        respawnFrames = 0;
+        spawnPlayer();
     }
 
 

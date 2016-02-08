@@ -426,7 +426,7 @@ var drawHUD = function (ctx, hud) {
     ctx.fillRect(0, c.height - bottomHudHeight, c.width, 2)
 
     // Text for HP and Ping
-    ctx.font = "24px PressStart2P"
+    ctx.font = "16px PressStart2P"
     ctx.textAlign = "start";
 
     
@@ -493,6 +493,20 @@ var drawHUD = function (ctx, hud) {
         } catch(err) {
             // A dead player does not have a color
         }
+    }
+
+    // remaining Time until next round
+    if (hud.timeRemaining) {
+        var mins = Math.floor(hud.timeRemaining/60000);
+        hud.timeRemaining %= 60000;
+        var s = Math.floor(hud.timeRemaining/1000);
+        s = ("0"+s).substr(-2,2);
+        hud.timeRemaining %= 1000;
+        var m = Math.floor(hud.timeRemaining/100);
+        ctx.fillStyle = "black";
+        ctx.font = "16px PressStart2P";
+        ctx.textAlign = "left"
+        ctx.fillText("Time: "+mins+":"+s, c.width/2 + hudBarWidth/2 +2, c.height-(hudBarHeight+1))
     }
 }
 
