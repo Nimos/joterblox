@@ -1,3 +1,18 @@
+// Settings for the bottom bar
+var bottomHudHeight = 54;
+var hudBarWidth = 300;
+var hudBarHeight = 16;
+var hudAmmoColor1 = "rgb(229, 103, 21)";
+var hudAmmoColor2 = "rgb(164, 84, 11)";
+var hudReloadColor1 = "rgb(70, 165, 215)";
+var hudReloadColor2 = "rgb(55, 128, 161)";
+var hudInactiveColor = "rgb(50,50,50)";
+var hudHpColor1 =  "rgb(18, 170, 83)";
+var hudHpColor2 = hudInactiveColor;
+var hudBarTextColor = "#fff";
+var hudBarFont = "16px PressStart2P"
+
+
 // Get rendering context
 var ctx = c.getContext("2d")
 
@@ -304,7 +319,7 @@ var drawMenu = function () {
 
 var drawMapBG = function (ctx, state) {
     c.width = state.map.size[0];
-    c.height = state.map.size[1] + 40;
+    c.height = state.map.size[1] + bottomHudHeight;
 
     for (var i = 0; i < state.map.rects.length; i++) {
         var r = state.map.rects[i];
@@ -403,31 +418,61 @@ var drawHUD = function (ctx, hud) {
 
     // Draw buttom bar
     ctx.fillStyle = "black";
-    ctx.fillRect(0, c.height - 40, c.width, 2)
+    ctx.fillRect(0, c.height - bottomHudHeight, c.width, 2)
 
     // Text for HP and Ping
     ctx.font = "20px PressStart2P"
     ctx.textAlign = "start";
 
-    ctx.fillText("HP: " + hud.hp, 2, c.height - 3);
-    ctx.fillText("PING: " + hud.ping, 175, c.height - 3);
+    
+    ctx.fillText("PING: " + hud.ping, 2, c.height - 3);
+
+    //HP Bar
+    ctx.fillStyle = hudHpColor2;
+    ctx.fillRect(c.width/2 - hudBarWidth/2, c.height-(hudBarHeight+1), hudBarWidth, hudBarHeight)
+    var pct = hud.hp / 100;
+    ctx.fillStyle = hudHpColor1;
+    ctx.fillRect(c.width/2 - hudBarWidth/2, c.height-(hudBarHeight+1), hudBarWidth * pct, hudBarHeight);
+
+    ctx.fillStyle = hudBarTextColor;
+    ctx.textAlign = "center";
+    ctx.font = hudBarFont
+    ctx.fillText(hud.hp +"/100", c.width/2, c.height)
 
     // Weapon ammo display, if we have one
     if (hud.weapon) {
         // Ammo counter
-        ctx.fillRect(c.width - 10, c.height - 39, 5, 38)
-        steps = 38 / hud.weapon.maxAmmo;
-        steps2 = hud.weapon.maxAmmo - hud.weapon.ammo;
-        ctx.fillStyle = "#FF0000";
-        ctx.fillRect(c.width - 10, c.height - 38 + steps2 * steps, 5, 38 - steps2 * steps);
+        ctx.fillStyle = hudAmmoColor2
+        ctx.fillRect(c.width/2 - hudBarWidth/2, c.height-2*(hudBarHeight+1), hudBarWidth, hudBarHeight)
+        var pct = hud.weapon.ammo / hud.weapon.maxAmmo;
+        ctx.fillStyle = hudAmmoColor1;
+        ctx.fillRect(c.width/2 - hudBarWidth/2, c.height-2*(hudBarHeight+1), hudBarWidth * pct, hudBarHeight);
+
+        ctx.fillStyle = hudBarTextColor;
+        ctx.textAlign = "center";
+        ctx.font = hudBarFont
+        ctx.fillText(hud.weapon.ammo +"/"+hud.weapon.maxAmmo, c.width/2, c.height-(hudBarHeight+1))
 
         // Reload cooldown
-        ctx.fillStyle = "#000"
-        ctx.fillRect(c.width - 16, c.height - 39, 5, 38)
-        steps = 38 / hud.weapon.ammoRecharge;
-        steps2 = hud.weapon.ammoRecharge - hud.weapon.ammoTicks;
-        ctx.fillStyle = "#FF8800";
-        ctx.fillRect(c.width - 16, c.height - 38 + steps2 * steps, 5, 38 - steps2 * steps);
+        ctx.fillStyle = hudReloadColor2;
+        if (hud.weapon.ammoRecharge == 1) {
+            ctx.fillStyle = hudInactiveColor;
+        }
+        ctx.fillRect(c.width/2 - hudBarWidth/2, c.height-3*(hudBarHeight+1), hudBarWidth, hudBarHeight)
+        var pct = hud.weapon.ammoTicks / hud.weapon.ammoRecharge;
+        ctx.fillStyle = hudReloadColor1;
+        ctx.fillRect(c.width/2 - hudBarWidth/2, c.height-3*(hudBarHeight+1), hudBarWidth * pct, hudBarHeight);
+
+        if (hud.weapon.ammoRecharge != 1) {
+            ctx.fillStyle = hudBarTextColor;
+            ctx.textAlign = "center";
+            ctx.font = hudBarFont
+            ctx.fillText( ((hud.weapon.ammoRecharge-hud.weapon.ammoTicks)/33.33).toFixed(2)+"s" , c.width/2, c.height-2*(hudBarHeight+1))     
+        }  
+    } else {
+        ctx.fillStyle = hudInactiveColor
+        ctx.fillRect(c.width/2 - hudBarWidth/2, c.height-3*(hudBarHeight+1), hudBarWidth, hudBarHeight)
+        ctx.fillRect(c.width/2 - hudBarWidth/2, c.height-2*(hudBarHeight+1), hudBarWidth, hudBarHeight)
     }
 
     // Green triangle over player when holding donw the alt key
