@@ -605,7 +605,7 @@ var drawScoreboard = function (ctx, state) {
     scoreboard = state.users.sort(function (a, b) {
         return (b.score - a.score)
     });
-    ctx.fillStyle = "#FFFFFF";
+    ctx.fillStyle = "rgba(255,255,255,0.6)";
     ctx.fillRect(100, 100, c.width - 200, c.height - 200);
     ctx.strokeStyle = "#000"
     ctx.strokeRect(100, 100, c.width - 200, c.height - 200);
