@@ -53,12 +53,17 @@ var Connection = function (game, socket) {
         }
 
         var now = (new Date).getTime();
-
+        var timer;
+        if (game.state == 1) {
+            timer = game.roundStart+settings.gameServer.roundTimer*1000-now;
+        } else if (game.state == 2) {
+            timer = game.roundStart+settings.gameServer.waitTime*1000-now;
+        }
         // Update player's screen with hud info
         if (player && player.active) { // User is in the Game, show game screen
-            socket.emit("hud", {"screen": 0, "hp": player.hp, "ping": this.ping, "weapon": player.weapon, "playerX": player.pos[0], "playerY": player.pos[1], "playerColor": player.color, "timeRemaining": game.roundStart+120000-now})
+            socket.emit("hud", {"screen": 0, "hp": player.hp, "ping": this.ping, "weapon": player.weapon, "playerX": player.pos[0], "playerY": player.pos[1], "playerColor": player.color, "timeRemaining": timer})
         } else if (player && !player.active) { // User is dead, show respawn screen
-            socket.emit("hud", {"screen": 1, "hp": 0, "ping": this.ping, "respawn": respawnFrames++, "timeRemaining": game.roundStart+120000-now})
+            socket.emit("hud", {"screen": 1, "hp": 0, "ping": this.ping, "respawn": respawnFrames++, "timeRemaining": timer})
         } else { // User has not joined yet, show menu
             socket.emit("hud", {"screen": 2, "hp": 0, "ping": this.ping, "weapon": null})
         }
@@ -80,7 +85,6 @@ var Connection = function (game, socket) {
 
     // Spawn/Respawn
     var spawnPlayer = function () {
-        console.log(player);
         // Don't spawn 2 players
         if (player && player.active) return;
         

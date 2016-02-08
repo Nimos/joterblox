@@ -498,12 +498,13 @@ var drawHUD = function (ctx, hud) {
 
     // remaining Time until next round
     if (hud.timeRemaining) {
-        var mins = Math.floor(hud.timeRemaining/60000);
-        hud.timeRemaining %= 60000;
-        var s = Math.floor(hud.timeRemaining/1000);
+        var t = hud.timeRemaining;
+        var mins = Math.floor(t/60000);
+        t %= 60000;
+        var s = Math.floor(t/1000);
         s = ("0"+s).substr(-2,2);
-        hud.timeRemaining %= 1000;
-        var m = Math.floor(hud.timeRemaining/100);
+        t %= 1000;
+        var m = Math.floor(t/100);
         ctx.fillStyle = "black";
         ctx.font = "16px PressStart2P";
         ctx.textAlign = "left"
@@ -532,6 +533,7 @@ var drawDeathScreen = function (ctx, hud) {
     }
 }
 
+var scoreboard;
 var drawScoreboard = function (ctx, state) {
     scoreboard = state.users.sort(function (a, b) {
         return (b.score - a.score)
@@ -547,6 +549,20 @@ var drawScoreboard = function (ctx, state) {
         s = scoreboard[i];
         ctx.fillText((i + 1) + ". " + s.name + ": " + s.score + " points (" + s.ping + " ms)", 105, 115 + i * 20);
     }
+}
+
+var drawRoundOver = function (ctx, hud) {
+    ctx.fillStyle = "black"
+    ctx.strokeStyle = "white"
+    ctx.textAlign = "center"
+    ctx.font = "40px PressStart2P"
+    ctx.fillText("Round over", c.width / 2, 50);
+    ctx.strokeText("Round over", c.width / 2, 50);
+    ctx.font = "24px PressStart2P"
+    var s = Math.floor(hud.timeRemaining/1000);
+    ctx.fillText("Next map in "+s+"...", c.width / 2, 80);
+    ctx.strokeText("Next map in "+s+"...", c.width / 2, 80);
+
 }
 
 // Listener for update socket events
@@ -587,7 +603,9 @@ var handleUpdate = function (s) {
     if (hud.screen == 1) drawDeathScreen(ctx, hud);
 
     // Draw the scoreboard if tab is held
-    if (showScores) drawScoreboard(ctx, state);
+    if (showScores || state.state == 2) drawScoreboard(ctx, state);
+
+    if (state.state == 2) drawRoundOver(ctx, hud);
 
     // draw the cursor
     drawCursor();

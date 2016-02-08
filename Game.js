@@ -37,6 +37,7 @@ var maps = settings.gameServer.randomMapList;
 
 // Round Timer in seconds
 var roundtimer = settings.gameServer.roundTimer;
+var waitTime = settings.gameServer.waitTime;
 
 
 // Main class to do things in
@@ -65,7 +66,7 @@ var Game = function () {
     this.sounds = [];
     this.messages = [];
 
-    // 1: RUNNING, 0: WAITING
+    // 1: RUNNING, 0: WAITING, 2: Between maps
     this.state = 0;
 
     // store when last round was started
@@ -84,24 +85,40 @@ var Game = function () {
     this.update = function () {
         // Measuring tick time to track performance issues
         var stopwatch = (new Date()).getTime()
+
         
         // Reset our sound and message queue
         this.sounds = [];
         this.messages = [];
-        
-        // Iterate over actors to do actor things
-        for (var i=0; i<actors.length; i++) {
-            if (actors[i].remove) {// remove actor if something flagged it for remove
-                actors.splice(i--, 1);
-                continue;
-            }
-            if (!actors[i].active) continue; // don't process if inactive
+            
+        if (this.state == 1) {
+            // Iterate over actors to do actor things
+            for (var i=0; i<actors.length; i++) {
+                if (actors[i].remove) {// remove actor if something flagged it for remove
+                    actors.splice(i--, 1);
+                    continue;
+                }
+                if (!actors[i].active) continue; // don't process if inactive
 
-            var r = actors[i].update();
-            if (!r) { // remove actor if its update() returns false
-                actors.splice(i--, 1);
-                continue;
+                var r = actors[i].update();
+                if (!r) { // remove actor if its update() returns false
+                    actors.splice(i--, 1);
+                    continue;
+                }
             }
+
+
+            // Add a new powerup every 100 ticks, up to maximum of 3
+            powerupcounter %= 100;
+            if (powerupcounter++ == 0) {
+                if (this.powerups < settings.gameServer.maxPowerups) {
+                    this.powerups++;
+                    new Powerup(this);
+                }
+
+            }
+
+            
         }
 
         // Iterate over connections to do connection things
@@ -114,26 +131,23 @@ var Game = function () {
             }
         }
 
-        // Add a new powerup every 100 ticks, up to maximum of 3
-        powerupcounter %= 100;
-        if (powerupcounter++ == 0) {
-            if (this.powerups < settings.gameServer.maxPowerups) {
-                this.powerups++;
-                new Powerup(this);
-            }
-
-        }
-
         // Output the message queue to console as well
         for (var i=0; i<this.messages.length; i++) console.log("[Game]", this.messages[i]);
-        
+
         // Wrap up all the important things in an object and send it to clients
-        var gameState = {"map": this.map, "actors": actors, "sounds": this.sounds, "messages": this.messages, "users": connections}
+        var gameState = {"map": this.map, "actors": actors, "sounds": this.sounds, "messages": this.messages, "users": connections, "state": this.state}
         io.emit('update', gameState);
 
         // Measure the time we took to process this tick and warn if it's higher than my arbitrary chosen threshold
         var tickTime = (new Date()).getTime()-stopwatch
         if (tickTime > 10) console.log("[Warning] Long tick time:", tickTime, "ms");
+    }
+
+    // Ends a round, starts countdown for the next
+    this.endRound = function () {
+        this.roundStart = (new Date).getTime();
+        setTimeout(this.init.bind(this), waitTime*1000)
+        this.state = 2;
     }
 
     // starts a new round
@@ -157,7 +171,7 @@ var Game = function () {
         }
         this.state = 1;
         this.roundStart = (new Date).getTime();
-        setTimeout(this.init.bind(this), roundtimer*1000)
+        setTimeout(this.endRound.bind(this), roundtimer*1000)
     }
 
     // check for collisions on a path

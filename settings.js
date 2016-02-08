@@ -12,6 +12,7 @@ var settings = {
     "gameServer": {
         "randomMapList": ["3lines", "smash"], // map to be selected in the random rotation,
         "roundTimer": 120, // how long one round lasts in seconds
+        "waitTime": 10, // How many seconds between each round
         "maxPowerups": 3, // how many powerups to spawn randomly
         "port": 3000, // Port on which the game server runs
     },
