@@ -229,20 +229,25 @@ var CanvasInput = function (ctx, name, x, y, width) {
         // Set text properties
         this.ctx.textAlign = this.align;
         this.ctx.font = this.fontSize + "px " + this.fontFace;
-        console.log(this.ctx.font);
         this.ctx.fillStyle = this.color;
+
+        // Correct different baselines of fonts
+        var baselineCorrection = 0;
+        if (this.fontFace == "PressStart2P") {
+            baselineCorrection = this.fontSize*0.25;
+        }
 
         // Draw the text
         // Display blinking underscore if input is possible and this is selected, none if maxLength is reached
         if (this.text.length == this.maxLength) {
-            ctx.fillText(this.text, myX, this.y, this.width);
+            ctx.fillText(this.text, myX, this.y+baselineCorrection, this.width);
         } else {
             if (animFrames % 50 > 25 && selectedInput == this) {
                 // Now you see me
-                ctx.fillText(this.text + "_", myX, this.y, this.width);
+                ctx.fillText(this.text + "_", myX, this.y+baselineCorrection, this.width);
             } else {
                 // Now you don't
-                ctx.fillText(this.text + " ", myX, this.y, this.width);
+                ctx.fillText(this.text + " ", myX, this.y+baselineCorrection, this.width);
             }
         }
     };
@@ -301,7 +306,7 @@ var drawMenu = function () {
         nameinput.maxLength = 20;
         nameinput.align = "center";
         nameinput.fontFace = "PressStart2P";
-        nameinput.fontSize = 28;
+        nameinput.fontSize = 40;
         nameinput.padding = 10;
         nameinput.color = "black";
         nameinput.borderWidth = 3;
@@ -421,7 +426,7 @@ var drawHUD = function (ctx, hud) {
     ctx.fillRect(0, c.height - bottomHudHeight, c.width, 2)
 
     // Text for HP and Ping
-    ctx.font = "20px PressStart2P"
+    ctx.font = "24px PressStart2P"
     ctx.textAlign = "start";
 
     
@@ -495,10 +500,10 @@ var drawDeathScreen = function (ctx, hud) {
     ctx.fillStyle = "black"
     ctx.strokeStyle = "white"
     ctx.textAlign = "center"
-    ctx.font = "35px PressStart2P"
+    ctx.font = "40px PressStart2P"
     ctx.fillText("You are dead.", c.width / 2, c.height / 2 - 25);
     ctx.strokeText("You are dead.", c.width / 2, c.height / 2 - 25);
-    ctx.font = "20px PressStart2P"
+    ctx.font = "24px PressStart2P"
     if (hud.respawn > 40) {
         ctx.fillText("Press any key to respawn.", c.width / 2, c.height / 2 + 25)
         ctx.strokeText("Press any key to respawn.", c.width / 2, c.height / 2 + 25)
@@ -693,12 +698,6 @@ document.onkeyup = function (e) {
         showLocationFinder = !showLocationFinder;
         e.preventDefault();
     }
-};
-
-// change/set name
-nameclick.onclick = function (e) {
-    sock.emit("setName", nameinput.value)
-    stopEvent(e);
 };
 
 // change/set color
