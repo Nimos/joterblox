@@ -56,7 +56,7 @@ var sounds = {
 };
 
 // Sprites we want to preload
-var preload = ["/assets/images/title.jpg", "/assets/images/cover.jpg", "/assets/images/entername.png", "/assets/images/shittybg.png", "/assets/images/smash.png"]
+var preload = ["/assets/images/title.jpg", "/assets/images/cover.jpg", "/assets/images/entername.png", "/assets/images/akirabg.png", "/assets/images/akirafg.png"];
 
 //Class to manage sprites
 var SpriteStorage = function () {
