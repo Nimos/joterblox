@@ -2,7 +2,7 @@ body {
 	text-align: center;
 	padding:3% 0 0 0;
 	min-width:1290px;
-	background-color:black;
+	background-color:#111629;
 	color:white;
 	/* Scale pictures by using nearest-neighbor interpolation for real 8bit feeling */
 	-ms-interpolation-mode: nearest-neighbor; /* Internet Explorer (non-standard property) */
