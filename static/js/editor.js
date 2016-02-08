@@ -118,8 +118,19 @@ var generateResult = function () {
   result += "\t\"size\": ["+width+","+height+"],\n"
   result += "\t\"rects\": [";
   for (var i=0; i<rects.length; i++) {
-    var r = rects[i];
-    result += "\n\t\t["+r[0]+","+r[1]+","+r[2]+","+r[3]+"],"
+    var r = [rects[i][0], rects[i][1], rects[i][2], rects[i][3]];
+    r[1] = height-r[1];
+    r[3] *= -1;
+    if (r[2] < 0) {
+      r[0]+=r[2];
+      r[2]= r[2]*-1;
+    }
+    console.log(r[3])
+    if (r[3] < 0) {
+      r[1] += r[3];
+      r[3] = r[3]*-1;
+    }
+    result += "\n\t\t["+r[0]+","+r[1]+","+r[2]+","+(r[3])+"],"
   }
   result = result.slice(0,-1);
   result += "\n\t],\n";
