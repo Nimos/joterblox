@@ -40,6 +40,10 @@ var selectedInput = null;
 // All inputs on this screen
 var allInputs = [];
 
+// Keep track of stuff.
+var connecting = false;
+var sock;
+
 // Load resources
 var sounds = {
     "powerup": new Audio("/assets/sounds/powerup.wav"),
@@ -52,7 +56,7 @@ var sounds = {
 };
 
 // Sprites we want to preload
-var preload = ["/assets/images/cover.jpg", "/assets/images/entername.png", "/assets/images/shittybg.png"]
+var preload = ["/assets/images/title.jpg", "/assets/images/cover.jpg", "/assets/images/entername.png", "/assets/images/shittybg.png", "/assets/images/smash.png"]
 
 //Class to manage sprites
 var SpriteStorage = function () {
@@ -631,6 +635,9 @@ var drawRoundOver = function (ctx, hud) {
 // Listener for update socket events
 // Redraws the game based on the last update, plays sounds and displays messages
 var handleUpdate = function (s) {
+    // This loop is taking over, end the other one
+    clearInterval(titleScreenInterval)
+    
     state = s;
     animFrames++;
 
@@ -679,35 +686,51 @@ var updateHud = function (data) {
     hud = data;
 }
 
-// Open the socket and add listeners
-var sock = io(window.location.hostname+":3000");
-sock.on("update", handleUpdate);
-sock.on("hud", updateHud);
+var connect = function () {
+    connecting = false;
+    if (sock) return; // Only connect once
+    // Open the socket and add listeners
+    sock = io(window.location.hostname+":"+settings.gameServer.port);
+    sock.on("update", handleUpdate);
+    sock.on("hud", updateHud);
 
-// I had weird problems naming those "ping" and "pong", maybe socket.io internally uses those? they disappeared after I renamed them to that
-sock.on("pung", function (time) {
-    sock.emit("pang", time);
-});
+    // I had weird problems naming those "ping" and "pong", maybe socket.io internally uses those? they disappeared after I renamed them to that
+    sock.on("pung", function (time) {
+        sock.emit("pang", time);
+    });
+
+    sock.on("disconnect", function () {
+        connected = false;
+        sock.disconnect()
+        sock = null;
+        titleScreenInterval = setInterval(titleScreenRefresh, 33);
+    });
+}
 
 // Add event listeners for inputs
 // I'm sure I could get away with only updating the cursor when the mouse is clicked, but I didn't have any bandwidth issues yet...
 c.onmousemove = function (e) {
-    sock.emit("mousemove", [e.offsetX, state.map.size[1] - e.offsetY])
+    if (sock) sock.emit("mousemove", [e.offsetX, state.map.size[1] - e.offsetY])
     cursor = [e.offsetX, e.offsetY]
     stopEvent(e);
 }
 
 // Shoot!
 c.onmousedown = function (e) {
-    sock.emit("presskey", "space");
+    if (sock) {
+        sock.emit("presskey", "space");
+    } else {
+        connecting = true;
+    }
     stopEvent(e);
 }
 
 // Stop shooting
 c.onmouseup = function (e) {
-    sock.emit("releasekey", "space");
+    if (sock) sock.emit("releasekey", "space");
     stopEvent(e);
 }
+
 
 // dont show context menu
 c.oncontextmenu = function (e) {
@@ -747,20 +770,22 @@ document.onkeydown = function (e) {
         }
     }
 
-    if (e.keyCode == "38" || e.keyCode == "87") {
-        sock.emit("presskey", "up");
-    }
-    if (e.keyCode == "40" || e.keyCode == "83") {
-        sock.emit("presskey", "down");
-    }
-    if (e.keyCode == "37" || e.keyCode == "65") {
-        sock.emit("presskey", "left");
-    }
-    if (e.keyCode == "39" || e.keyCode == "68") {
-        sock.emit("presskey", "right");
-    }
-    if (e.keyCode == "32") {
-        sock.emit("presskey", "up");
+    if (sock) {
+        if (e.keyCode == "38" || e.keyCode == "87") {
+            sock.emit("presskey", "up");
+        }
+        if (e.keyCode == "40" || e.keyCode == "83") {
+            sock.emit("presskey", "down");
+        }
+        if (e.keyCode == "37" || e.keyCode == "65") {
+            sock.emit("presskey", "left");
+        }
+        if (e.keyCode == "39" || e.keyCode == "68") {
+            sock.emit("presskey", "right");
+        }
+        if (e.keyCode == "32") {
+            sock.emit("presskey", "up");
+        }
     }
 
     if (e.keyCode == "9") {
@@ -775,20 +800,22 @@ document.onkeydown = function (e) {
 };
 
 document.onkeyup = function (e) {
-    if (e.keyCode == "38" || e.keyCode == "87") {
-        sock.emit("releasekey", "up");
-    }
-    if (e.keyCode == "40" || e.keyCode == "83") {
-        sock.emit("releasekey", "down");
-    }
-    if (e.keyCode == "37" || e.keyCode == "65") {
-        sock.emit("releasekey", "left");
-    }
-    if (e.keyCode == "39" || e.keyCode == "68") {
-        sock.emit("releasekey", "right");
-    }
-    if (e.keyCode == "32") {
-        sock.emit("releasekey", "up");
+    if (sock) {
+        if (e.keyCode == "38" || e.keyCode == "87") {
+            sock.emit("releasekey", "up");
+        }
+        if (e.keyCode == "40" || e.keyCode == "83") {
+            sock.emit("releasekey", "down");
+        }
+        if (e.keyCode == "37" || e.keyCode == "65") {
+            sock.emit("releasekey", "left");
+        }
+        if (e.keyCode == "39" || e.keyCode == "68") {
+            sock.emit("releasekey", "right");
+        }
+        if (e.keyCode == "32") {
+            sock.emit("releasekey", "up");
+        }
     }
     if (e.keyCode == "9") {
         showScores = false;
@@ -801,9 +828,39 @@ document.onkeyup = function (e) {
     }
 };
 
+
+// Draw pre-connect screen
+var titleScreenRefresh = function () {
+    if (connecting) {
+        connect();
+    }
+
+    animFrames++; // we're not running onUpdate, so increment them here
+    c.width = settings.client.mainMenuWidth;
+    c.height = settings.client.mainMenuHeight;
+    ctx.clearRect(0,0,c.width, c.height);
+
+    sprites.draw(ctx, "/assets/images/title.jpg", 0, 0, c.width, c.height);
+    if (animFrames % 50 < 25) {
+        ctx.fillStyle = "#fff"
+        ctx.strokeStyle = "#000"
+        ctx.font = "40px PressStart2P";
+        ctx.textAlign = "center";
+        ctx.fillText("PRESS ANY KEY", c.width/2, 650);
+        ctx.strokeText("PRESS ANY KEY", c.width/2, 650);
+    }
+
+    ctx.strokeStyle = "#fff"
+    drawCursor();
+}
+
+var titleScreenInterval = setInterval(titleScreenRefresh, 33)
+
 // change/set color
 colorclick.onclick = function (e) {
-    sock.emit("setColor", [c1.value, c2.value, c3.value])
+    if (sock) {
+        sock.emit("setColor", [c1.value, c2.value, c3.value])
+    }
     stopEvent(e);
 }
 
