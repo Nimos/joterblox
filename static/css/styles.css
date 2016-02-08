@@ -39,6 +39,7 @@ canvas:hover {
 	border-color: #273c54 #5590aa #5590aa #273c54 !important;
 	text-shadow:none;
 	box-shadow:none;
+	color:#a8d9f5;
 }
 .link-button:active span{
 	position:relative;
