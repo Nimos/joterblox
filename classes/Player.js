@@ -38,6 +38,12 @@ var Player = function (game, connection, name, color) {
     var lasthitby =  null;
     this.lasthitby = {"name": "", "weapon": ""};
 
+    this.hookState = 0; //0 not fired, 1 moving, 2 hooked
+    this.hookTarget = [0,0];
+    this.hookPos = [0,0];
+    var hook = new Weapon(game, "hook", this);
+
+
 
     this.setLastHitBy = function (player, weapon) {
         this.lasthitby = {"name": player.name, "weapon": weapon};
@@ -81,6 +87,22 @@ var Player = function (game, connection, name, color) {
         if (keys.space) {
             this.weapon.shoot(this, this.pos, cursor)
         }
+
+        // Hook
+        if (keys.rmb && this.hookState == 0) {
+            this.hookState = 1;
+            hook.shoot(this, this.pos, cursor);
+        }
+
+        if (!keys.rmb) this.hookState = 0;
+
+        if (this.hookState == 2) {
+            var v = [this.hookPos[0]-this.pos[0], this.hookPos[1]-this.pos[1]];
+            this.speed[0] += v[0]/60;
+            this.speed[1] += v[1]/60;
+            new Effect(game, "laser", 1, [this.hookPos[0],this.hookPos[1]], this.pos)
+        }
+
         // process ammo reload
         this.weapon.updateAmmo(keys.space)
 

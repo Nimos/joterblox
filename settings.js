@@ -6,7 +6,8 @@ var settings = {
         "hdeceleration": 5, // how much to slow down horizontally by every tick while not moving
         "jumpSpeed": 20, // how much upwards speed to add when jump is pressed
         "gravity": 2, // how much to accellerate downwards every tick
-        "hitBoxSize": 10 // size of player hitbox
+        "hitBoxSize": 10, // size of player hitbox
+        "hookEnabled": true
     },
 
     "gameServer": {

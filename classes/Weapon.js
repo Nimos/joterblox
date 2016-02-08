@@ -177,6 +177,32 @@ var Weapon = function (game, name, owner) {
             target = [pos[0]+v2[0], pos[1]+v2[1]];
             new Projectile(game, pos, target, this, player);
         }
+    } else if (name == "hook") {
+        this.maxAmmo = 1;
+        this.ammo = 1;
+        this.ammoRecharge = 1;
+        this.fireRate = 0;
+
+        this.bulletSize = 4;
+        this.bulletColor = "rgb(20,40,20)"
+        this.weaponColor = "rgb(120,127,120)"
+
+        this.bulletSpeed = 20;
+        this.bulletGravity = 0;
+        this.bulletLife = 100;
+
+        this.onImpact = function (target, projectile) {
+            if (target) return 1;
+            owner.hookPos = [projectile.pos[0], projectile.pos[1]];
+            owner.hookState = 2;
+            return 0;
+        };
+
+        this.onShot = function (player, pos, target) {
+            this.ammo = 10;
+            new Projectile(game, pos, target, this, player);
+        }
+    
     } else {// Default gun
         this.bulletSpeed = 20;
         this.bulletGravity = 1;
@@ -208,6 +234,7 @@ var Weapon = function (game, name, owner) {
 
     // Called by player object to shoot
     this.shoot = function (player, pos, target) {
+        console.log(this.ammo, this.cooldown);
         if (this.ammo > 0 && this.cooldown <= 0) {
             if (this.onShot) {
                 this.onShot(player, pos, target);

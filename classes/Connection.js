@@ -9,7 +9,8 @@ var Connection = function (game, socket) {
         "down": false,
         "left": false,
         "right": false,
-        "space": false
+        "space": false,
+        "rmb": false
     }
     this.cursor = [0,0];
     
