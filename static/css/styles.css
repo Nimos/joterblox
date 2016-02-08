@@ -44,7 +44,7 @@ canvas:hover {
 .link-button:active span{
 	position:relative;
 	top:2px;
-	left:-2px;
+	left:2px;
 }
 .link-button:hover{
 	background-color:#48b0ca;
