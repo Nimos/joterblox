@@ -112,9 +112,9 @@
    "backgroundImage": "/assets/images/akirabg.png",
    "foregroundImage": "/assets/images/akirafg.png",
    "bounds": [
-      "1",
-      "0",
-      "0",
-      "0"
+      1,
+      0,
+      0,
+      0      
    ]
 }

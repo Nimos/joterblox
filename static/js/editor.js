@@ -228,8 +228,8 @@ var generateResult = function () {
 
   result["backgroundImage"] = "";
   result["foregroundImage"] = "";
-  result["bounds"] = [bs0.value, bs1.value, bs2.value, bs3.value];
-  document.getElementById('result').value = JSON.stringify(result, null, 3);
+  result["bounds"] = [parseInt(bs0.value), parseInt(bs1.value), parseInt(bs2.value), parseInt(bs3.value)];
+  document.getElementById('result').value = JSON.stringify(result,null, 3);
 }
 
 document.getElementById('result').oninput = function (e) {
