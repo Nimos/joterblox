@@ -4,12 +4,45 @@
         <title>Level Editor - Joter Blox</title>
         <meta name="author" content="#YOLO Entertainment">
         <link rel="icon" href="/static/images/favicon.png">
-        <link rel="stylesheet" href="/static/css/styles.css?v=1.0">
+        <style>body {text-align: center} canvas {border: 1px solid #888;}</style>
     </head>
     <body>
         Background Image to use: <input type="file" id="files" name="files"> <br>
         <canvas id="c"></canvas><br>
-        Click/Drag to add Collision Zone, Right click to undo
+        Click/Drag to add something, Right click to undo
+        <br>
+        Current Tool: <select id="tool"><option value="c">Collision</option><option value="s">Player Spawn</option><option value="p">Powerup spawn</option></select>
+        <div style="margin-left: auto; margin-right: auto; width: 200px; text-align: left">
+            <h4 style="text-align: center">Border Settings</h4>
+            Top:
+            <select id="bs0">
+                <option value="0">Solid</option>
+                <option selected value="1">Fall-Through</option>
+                <option value="2">KILL</option>
+            </select>
+            <br>
+            Right:
+            <select id="bs1">
+                <option value="0">Solid</option>
+                <option value="1">Fall-Through</option>
+                <option value="2">KILL</option>
+            </select>
+            <br>
+            bottom:
+            <select id="bs2">
+                <option value="0">Solid</option>
+                <option value="1">Fall-Through</option>
+                <option value="2">KILL</option>
+            </select>
+            <br>
+            Left:
+            <select id="bs3">
+                <option value="0">Solid</option>
+                <option value="1">Fall-Through</option>
+                <option value="2">KILL</option>
+            </select>
+        </div>
+
         <br>
         <h4>Result:</h4>
         <textarea style="width: 400px; height: 600px" id="result"></textarea>

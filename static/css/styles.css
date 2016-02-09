@@ -2,7 +2,8 @@ body {
 	text-align: center;
 	padding:3% 0 0 0;
 	min-width:1290px;
-
+	background-color:#111629;
+	color:white;
 	/* Scale pictures by using nearest-neighbor interpolation for real 8bit feeling */
 	-ms-interpolation-mode: nearest-neighbor; /* Internet Explorer (non-standard property) */
 	image-rendering: -moz-crisp-edges; /* Firefox does not support pixelated (yet) */
@@ -12,11 +13,42 @@ body {
 }
 canvas {
 	border: 3px solid black;
+	background-color:white;
+	margin:0 0 25px;
 }
 canvas:hover {
 	cursor: none;
 }
-
+.link-button:link,
+.link-button:visited{
+	font-family: 'PressStart2P';
+	display: inline-block;
+	background-color: #398BAA;
+	padding: 10px 25px;
+	text-shadow: 2px 2px 0 black;
+	text-decoration: none;
+	color: white;
+	border-style: solid;
+	border-width: 2px;
+	border-color: #79c0db #316886 #316886 #79c0db;
+	margin:0 25px;
+	box-shadow: 3px 3px 0 black;
+}
+.link-button:active{
+	background-color:#377998 !important;
+	border-color: #273c54 #5590aa #5590aa #273c54 !important;
+	text-shadow:none;
+	box-shadow:none;
+	color:#a8d9f5;
+}
+.link-button:active span{
+	position:relative;
+	top:2px;
+	left:2px;
+}
+.link-button:hover{
+	background-color:#48b0ca;
+}
 @font-face {
     font-family: 'PressStart2P';
     src: url('/assets/PressStart2P.ttf') format('truetype');

@@ -32,6 +32,7 @@ var Connection = function (game, socket) {
     var player = null;
     var respawnFrames = 0;
     this.score = 0;
+    this.joined = false;
 
 
     // Things to do regularily
@@ -77,6 +78,7 @@ var Connection = function (game, socket) {
 
     // Called when a round is restarted
     this.reset = function () {
+        if (!this.joined) return;
         player = null;
         this.score = 0;
         respawnFrames = 0;
@@ -99,6 +101,7 @@ var Connection = function (game, socket) {
         player = new Player(game, self, name, color)
         player.active = true;
         respawnFrames = 0;
+        self.joined = true;
     }
 
 

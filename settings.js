@@ -11,7 +11,7 @@ var settings = {
     },
 
     "gameServer": {
-        "randomMapList": ["3lines", "smash"], // map to be selected in the random rotation,
+        "randomMapList": ["akirajungle"], // map to be selected in the random rotation,
         "roundTimer": 120, // how long one round lasts in seconds
         "waitTime": 10, // How many seconds between each round
         "maxPowerups": 3, // how many powerups to spawn randomly
@@ -52,6 +52,12 @@ var settings = {
         "mainMenuHeight": 720,
         "mainMenuWidth": 1280,
 
+    },
+
+    "pingDisplay": {
+        // Options for ping displaying bars
+        "colors": ["rgb(255, 0, 0)", "rgb(255, 128, 0)", "rgb(255, 255, 0)", "rgb(0, 255, 0"], // Colors in which to display individual ranges (High to low, 4 only)
+        "ranges": [250, 120, 50] // High to low, ranges are infinite-first, ..., last-0 (only 4 ranges possible)
     }
 }
 

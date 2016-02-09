@@ -40,6 +40,10 @@ var selectedInput = null;
 // All inputs on this screen
 var allInputs = [];
 
+// Keep track of stuff.
+var connecting = false;
+var sock;
+
 // Load resources
 var sounds = {
     "powerup": new Audio("/assets/sounds/powerup.wav"),
@@ -52,7 +56,7 @@ var sounds = {
 };
 
 // Sprites we want to preload
-var preload = ["/assets/images/cover.jpg", "/assets/images/entername.png", "/assets/images/shittybg.png"]
+var preload = ["/assets/images/title.jpg", "/assets/images/cover.jpg", "/assets/images/entername.png", "/assets/images/akirabg.png", "/assets/images/akirafg.png"];
 
 //Class to manage sprites
 var SpriteStorage = function () {
@@ -276,12 +280,76 @@ var CanvasInput = function (ctx, name, x, y, width) {
     }
 };
 
+var PingDisplay = function(ctx, x, y, size, showText) {
+    // Coordinate origin is bottom left (thanksmos)
+    this.x = x;
+    this.y = y;
+    this.size = size; // height of the first bar in px (0.25*height of fourth bar)
+    this.showText = showText || false; // Show ping in ms next to the bars?
+
+    this.lineWidth = 2; // How thick is the outline (2 seems to be good)
+
+    // Call this to draw me
+    this.draw = function() {
+        // Set the color based on the range the ping is in
+        if (hud.ping < settings.pingDisplay.ranges[2]) {
+            this.color = settings.pingDisplay.colors[3];
+        } else if (hud.ping < settings.pingDisplay.ranges[1]) {
+            this.color = settings.pingDisplay.colors[2];
+        } else if (hud.ping < settings.pingDisplay.ranges[0]) {
+            this.color = settings.pingDisplay.colors[1];
+        } else {
+            this.color = settings.pingDisplay.colors[0];
+        }
+
+        // Prepare font, stroke and fill properties
+        ctx.font = 4 * this.size + "px PressStart2P";
+        ctx.lineWidth = this.lineWidth;
+        ctx.strokeStyle = "black";
+        ctx.fillStyle = this.color;
+
+        // Outlines
+        ctx.strokeRect(this.x + 0 * this.size * 1.5, c.height - this.y - this.size - this.size * 0, this.size * 0.9, 1 * this.size);
+        ctx.strokeRect(this.x + 1 * this.size * 1.5, c.height - this.y - this.size - this.size * 1, this.size * 0.9, 2 * this.size);
+        ctx.strokeRect(this.x + 2 * this.size * 1.5, c.height - this.y - this.size - this.size * 2, this.size * 0.9, 3 * this.size);
+        ctx.strokeRect(this.x + 3 * this.size * 1.5, c.height - this.y - this.size - this.size * 3, this.size * 0.9, 4 * this.size);
+
+        // Always fill first bar (Even if ping is 35836983590 years)
+            ctx.fillRect(this.x + 0 * this.size * 1.5, c.height - this.y - this.size - this.size * 0, this.size * 0.9, 1 * this.size);
+
+        // Fill second bar if ping is lower than worst
+        if (hud.ping < settings.pingDisplay.ranges[0]) { //
+            ctx.fillRect(this.x + 1 * this.size * 1.5, c.height - this.y - this.size - this.size * 1, this.size * 0.9, 2 * this.size);
+        }
+
+        // Fill third bar if ping is okay but not perfect
+        if (hud.ping < settings.pingDisplay.ranges[1]) {
+            ctx.fillRect(this.x + 2 * this.size * 1.5, c.height - this.y - this.size - this.size * 2, this.size * 0.9, 3 * this.size);
+        }
+
+        // Fill fourth bar if ping is really good
+        if (hud.ping < settings.pingDisplay.ranges[2]) {
+            ctx.fillRect(this.x + 3 * this.size * 1.5, c.height - this.y - this.size - this.size * 3, this.size * 0.9, 4 * this.size);
+        }
+
+        // Write ping in ms right to the bars
+        if (this.showText) {
+            ctx.textAlign = "left";
+            ctx.strokeStyle = "black";
+            ctx.strokeText(hud.ping, this.x + 5 * this.size * 1.5, c.height - this.y);
+            ctx.fillStyle = this.color;
+            ctx.fillText(hud.ping, this.x + 5 * this.size * 1.5, c.height - this.y);
+        }
+    }
+};
+
 // Frame counter to base animations on
 var animFrames = 0;
 
 
 // draw mouse cursor
 var drawCursor = function () {
+    ctx.strokeStyle = "#f0f"
     ctx.strokeRect(cursor[0] - 1, cursor[1] - 1, 2, 2);
     ctx.beginPath();
     ctx.moveTo(cursor[0] + 4, cursor[1] + 4);
@@ -422,7 +490,9 @@ var drawHUD = function (ctx, hud) {
         ctx.fillText(messagelog[i], 10, 15 + 15 * i);
     }
 
-    // Draw buttom bar
+    // Draw bottom bar
+    ctx.fillStyle = "#444";
+    ctx.fillRect(0, c.height - bottomHudHeight, c.width, bottomHudHeight)
     ctx.fillStyle = "black";
     ctx.fillRect(0, c.height - bottomHudHeight, c.width, 2)
 
@@ -430,8 +500,8 @@ var drawHUD = function (ctx, hud) {
     ctx.font = "16px PressStart2P"
     ctx.textAlign = "start";
 
-    
-    ctx.fillText("PING: " + hud.ping, 2, c.height - 3);
+    var ping = new PingDisplay(ctx, 10, 10, 4, true);
+    ping.draw();
 
     //HP Bar
     ctx.fillStyle = hudHpColor2;
@@ -545,29 +615,94 @@ var drawScoreboard = function (ctx, state) {
     ctx.fillStyle = "black";
     ctx.textAlign = "start";
     ctx.font = "15px sans-serif";
+    var n = 0;
     for (var i = 0; i < scoreboard.length; i++) {
         s = scoreboard[i];
-        ctx.fillText((i + 1) + ". " + s.name + ": " + s.score + " points (" + s.ping + " ms)", 105, 115 + i * 20);
+        if (s.joined) {
+            ctx.fillText((i-n + 1) + ". " + s.name + ": " + s.score + " points (" + s.ping + " ms)", 105, 115 + (i-n) * 20);
+        } else {
+            n++;
+        }
     }
 }
 
-var drawRoundOver = function (ctx, hud) {
-    ctx.fillStyle = "black"
-    ctx.strokeStyle = "white"
+var drawEndscreen = function (ctx) {
+    var roundOverHeight = 480;
+    var roundOverWidth = 800;
+
+    var cornerX = c.width/2 - roundOverWidth/2;
+    var cornerY = c.height/2 - roundOverHeight/2;
+    
+    // Background Box
+    ctx.fillStyle = "rgba(255, 255, 255, 0.6)";
+    ctx.strokeStyle = "#000";
+    ctx.fillRect(c.width/2 - roundOverWidth/2, c.height/2 - roundOverHeight/2, roundOverWidth, roundOverHeight)
+    ctx.lineWidth=4;
+    ctx.strokeRect(c.width/2 - roundOverWidth/2, c.height/2 - roundOverHeight/2, roundOverWidth, roundOverHeight)
+    ctx.lineWidth=1;
+
+    // Scoreboard
+    scoreboard = state.users.sort(function (a, b) {
+        return (b.score - a.score)
+    });
+
+    ctx.font = "24px PressStart2P"
+    ctx.textAlign = "left"
+    ctx.fillStyle = "black";
+    ctx.fillText("Scoreboard", cornerX+8, cornerY+38);
+
+    ctx.font = "8px PressStart2P";
+    var n=0;
+    for (var i = 0; i < scoreboard.length; i++) {
+        s = scoreboard[i];
+        if (s.joined) {
+            ctx.fillText((i-n + 1) + ". " + s.name + ": " + s.score + " points (" + s.ping + " ms)", cornerX+30, 40+cornerY + (1+i-n) * 20);
+        } else {
+            n++;
+        } 
+    }
+    
+
+    // Map Winner
+    ctx.font = "16px PressStart2P";
+    ctx.textAlign = "right";
+    ctx.fillText("This  round goes to...", roundOverWidth+cornerX - 20, cornerY+38);
+    ctx.font = "24px PressStart2P";
     ctx.textAlign = "center"
-    ctx.font = "40px PressStart2P"
-    ctx.fillText("Round over", c.width / 2, 50);
-    ctx.strokeText("Round over", c.width / 2, 50);
+    ctx.fillText(scoreboard[0].name, cornerX+roundOverWidth-195, cornerY+100)
+    
+    
+    // Map Vote    
+    ctx.font = "16px PressStart2P";
+    ctx.textAlign = "right";
+    ctx.fillText("Vote for the next map:", cornerX+roundOverWidth-20, cornerY+200);
+    sprites.draw(ctx, "/assets/images/akirabg.png", cornerX+roundOverWidth-195, cornerY+220, 175, 100)
+    sprites.draw(ctx, "/assets/images/akirabg.png", cornerX+roundOverWidth-375, cornerY+220, 175, 100)
+    sprites.draw(ctx, "/assets/images/akirabg.png", cornerX+roundOverWidth-195, cornerY+325, 175, 100)
+    sprites.draw(ctx, "/assets/images/akirabg.png", cornerX+roundOverWidth-375, cornerY+325, 175, 100)
+
+
+    // Timer
     ctx.font = "24px PressStart2P"
     var s = Math.floor(hud.timeRemaining/1000);
-    ctx.fillText("Next map in "+s+"...", c.width / 2, 80);
-    ctx.strokeText("Next map in "+s+"...", c.width / 2, 80);
+    ctx.textAlign = "right";
+    ctx.fillText("Next map in "+s+"...", cornerX+roundOverWidth-30, cornerY+roundOverHeight-10);
+    
+    // Above Text
+    ctx.fillStyle = "white"
+    ctx.textAlign = "center"
+    ctx.font = "32px PressStart2P";
+    ctx.fillText("Round over", c.width / 2, 50);
+    ctx.strokeText("Round over", c.width / 2, 50);
 
 }
 
 // Listener for update socket events
 // Redraws the game based on the last update, plays sounds and displays messages
 var handleUpdate = function (s) {
+    // This loop is taking over, end the other one
+    clearInterval(titleScreenInterval)
+    
     state = s;
     animFrames++;
 
@@ -603,7 +738,10 @@ var handleUpdate = function (s) {
     if (hud.screen == 1) drawDeathScreen(ctx, hud);
 
     // Draw the scoreboard if tab is held
-    if (showScores || state.state == 2) drawScoreboard(ctx, state);
+    if (state.state == 2) {
+        drawEndscreen(ctx);
+    } else if (showScores) drawScoreboard(ctx, state);
+
 
     if (state.state == 2) drawRoundOver(ctx, hud);
 
@@ -616,37 +754,55 @@ var updateHud = function (data) {
     hud = data;
 }
 
-// Open the socket and add listeners
-var sock = io(window.location.hostname+":3000");
-sock.on("update", handleUpdate);
-sock.on("hud", updateHud);
+var connect = function () {
+    connecting = false;
+    if (sock) return; // Only connect once
+    // Open the socket and add listeners
+    sock = io(window.location.hostname+":"+settings.gameServer.port);
+    sock.on("update", handleUpdate);
+    sock.on("hud", updateHud);
 
-// I had weird problems naming those "ping" and "pong", maybe socket.io internally uses those? they disappeared after I renamed them to that
-sock.on("pung", function (time) {
-    sock.emit("pang", time);
-});
+    // I had weird problems naming those "ping" and "pong", maybe socket.io internally uses those? they disappeared after I renamed them to that
+    sock.on("pung", function (time) {
+        sock.emit("pang", time);
+    });
+
+    sock.on("disconnect", function () {
+        connected = false;
+        sock.disconnect()
+        sock = null;
+        titleScreenInterval = setInterval(titleScreenRefresh, 33);
+    });
+}
 
 // Add event listeners for inputs
 // I'm sure I could get away with only updating the cursor when the mouse is clicked, but I didn't have any bandwidth issues yet...
 c.onmousemove = function (e) {
-    sock.emit("mousemove", [e.offsetX, state.map.size[1] - e.offsetY])
+    if (sock) sock.emit("mousemove", [e.offsetX, state.map.size[1] - e.offsetY])
     cursor = [e.offsetX, e.offsetY]
     stopEvent(e);
 }
 
 // Shoot!
 c.onmousedown = function (e) {
-    if (e.button == 0) sock.emit("presskey", "space");
-    if (e.button == 2) sock.emit("presskey", "rmb");
+    if (sock) {
+        if (e.button == 0) sock.emit("presskey", "space");
+        if (e.button == 2) sock.emit("presskey", "rmb");
+    } else {
+        connecting = true;
+    }
     stopEvent(e);
 }
 
 // Stop shooting
 c.onmouseup = function (e) {
-    if (e.button == 0) sock.emit("releasekey", "space");
-    if (e.button == 2) sock.emit("releasekey", "rmb");
+    if (sock) {
+        if (e.button == 0) sock.emit("releasekey", "space");
+        if (e.button == 2) sock.emit("releasekey", "rmb");
+    }
     stopEvent(e);
 }
+
 
 // dont show context menu
 c.oncontextmenu = function (e) {
@@ -686,20 +842,22 @@ document.onkeydown = function (e) {
         }
     }
 
-    if (e.keyCode == "38" || e.keyCode == "87") {
-        sock.emit("presskey", "up");
-    }
-    if (e.keyCode == "40" || e.keyCode == "83") {
-        sock.emit("presskey", "down");
-    }
-    if (e.keyCode == "37" || e.keyCode == "65") {
-        sock.emit("presskey", "left");
-    }
-    if (e.keyCode == "39" || e.keyCode == "68") {
-        sock.emit("presskey", "right");
-    }
-    if (e.keyCode == "32") {
-        sock.emit("presskey", "up");
+    if (sock) {
+        if (e.keyCode == "38" || e.keyCode == "87") {
+            sock.emit("presskey", "up");
+        }
+        if (e.keyCode == "40" || e.keyCode == "83") {
+            sock.emit("presskey", "down");
+        }
+        if (e.keyCode == "37" || e.keyCode == "65") {
+            sock.emit("presskey", "left");
+        }
+        if (e.keyCode == "39" || e.keyCode == "68") {
+            sock.emit("presskey", "right");
+        }
+        if (e.keyCode == "32") {
+            sock.emit("presskey", "up");
+        }
     }
 
     if (e.keyCode == "9") {
@@ -714,20 +872,22 @@ document.onkeydown = function (e) {
 };
 
 document.onkeyup = function (e) {
-    if (e.keyCode == "38" || e.keyCode == "87") {
-        sock.emit("releasekey", "up");
-    }
-    if (e.keyCode == "40" || e.keyCode == "83") {
-        sock.emit("releasekey", "down");
-    }
-    if (e.keyCode == "37" || e.keyCode == "65") {
-        sock.emit("releasekey", "left");
-    }
-    if (e.keyCode == "39" || e.keyCode == "68") {
-        sock.emit("releasekey", "right");
-    }
-    if (e.keyCode == "32") {
-        sock.emit("releasekey", "up");
+    if (sock) {
+        if (e.keyCode == "38" || e.keyCode == "87") {
+            sock.emit("releasekey", "up");
+        }
+        if (e.keyCode == "40" || e.keyCode == "83") {
+            sock.emit("releasekey", "down");
+        }
+        if (e.keyCode == "37" || e.keyCode == "65") {
+            sock.emit("releasekey", "left");
+        }
+        if (e.keyCode == "39" || e.keyCode == "68") {
+            sock.emit("releasekey", "right");
+        }
+        if (e.keyCode == "32") {
+            sock.emit("releasekey", "up");
+        }
     }
     if (e.keyCode == "9") {
         showScores = false;
@@ -740,9 +900,39 @@ document.onkeyup = function (e) {
     }
 };
 
+
+// Draw pre-connect screen
+var titleScreenRefresh = function () {
+    if (connecting) {
+        connect();
+    }
+
+    animFrames++; // we're not running onUpdate, so increment them here
+    c.width = settings.client.mainMenuWidth;
+    c.height = settings.client.mainMenuHeight;
+    ctx.clearRect(0,0,c.width, c.height);
+
+    sprites.draw(ctx, "/assets/images/title.jpg", 0, 0, c.width, c.height);
+    if (animFrames % 50 < 25) {
+        ctx.fillStyle = "#fff"
+        ctx.strokeStyle = "#000"
+        ctx.font = "40px PressStart2P";
+        ctx.textAlign = "center";
+        ctx.fillText("PRESS ANY KEY", c.width/2, 650);
+        ctx.strokeText("PRESS ANY KEY", c.width/2, 650);
+    }
+
+    ctx.strokeStyle = "#fff"
+    drawCursor();
+}
+
+var titleScreenInterval = setInterval(titleScreenRefresh, 33)
+
 // change/set color
 colorclick.onclick = function (e) {
-    sock.emit("setColor", [c1.value, c2.value, c3.value])
+    if (sock) {
+        sock.emit("setColor", [c1.value, c2.value, c3.value])
+    }
     stopEvent(e);
 }
 
