@@ -11,6 +11,10 @@ var Map = function (game, mapname) {
     // 0: Solid, 1: not solid, 2: kill
     var bounds = [0,0,0,0];
 
+    // Random if empty
+    var powerupSpawns = [];
+    var playerSpawns = [];
+
     this.load = function (name) {
         var m = require("../maps/"+name+".json")
 
@@ -23,6 +27,8 @@ var Map = function (game, mapname) {
         this.backgroundImage = m.backgroundImage;
         this.foregroundImage = m.foregroundImage;
         bounds = m.bounds;
+        if (m.powerups) powerupSpawns = m.powerups;
+        if (m.spawns) playerSpawns = m.spawns;
 
         return true;
     }
@@ -52,6 +58,32 @@ var Map = function (game, mapname) {
         }
 
         return collides;
+    }
+
+    // Returns one of the map's powerup spawns, or picks a random coordinate
+    this.getPowerupSpawn = function () {
+        if (powerupSpawns.length > 0) {
+            return powerupSpawns[Math.floor( Math.random() * powerupSpawns.length )];
+        } else {
+            do {
+                var x = Math.round( Math.random() * this.size[0]-200 )+100;
+                var y = Math.round( Math.random() * this.size[1]-200 )+100;
+            } while (this.checkCollision([x,y], 20)[1]);
+            return [x,y];
+        }
+    }
+
+    // Returns one of the map's player spawns, or picks a random coordinate
+    this.getPlayerSpawn = function () {
+        if (playerSpawns.length > 0) {
+            return playerSpawns[Math.floor( Math.random() * playerSpawns.length )];
+        } else {
+            do {
+                var x = Math.round( Math.random() * this.size[0]-200 )+100;
+                var y = Math.round( Math.random() * this.size[1]-200 )+100;
+            } while (this.checkCollision([x,y], settings.player.hitBoxSize)[1]);
+            return [x,y];
+        }
     }
 
     // Checks if object is outside of the map

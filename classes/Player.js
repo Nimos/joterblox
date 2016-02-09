@@ -31,7 +31,7 @@ var Player = function (game, connection, name, color) {
     this.speed = [0, 0];
     this.hp = maxhp;
     this.weapon = new Weapon(game, "default", this);
-    this.pos = [Math.random()*(game.map.size[0]-200)+100, Math.random()*(game.map.size[1]-100)+100];
+    this.pos = game.map.getPlayerSpawn();
     this.type = "player";
     this.state = STANDING;
 

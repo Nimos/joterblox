@@ -8,7 +8,7 @@ var Powerup = function (game) {
     this.content = types[Math.floor(Math.random()*types.length)]
 
     // Pick random spawn point
-    this.pos = [Math.random()*(game.map.size[0]-200)+100, Math.random()*(game.map.size[1]-200)+100];
+    this.pos = game.map.getPowerupSpawn();
     // but always move down to the first ground    
     while (!game.map.checkCollision(this.pos, 20)[1] && !game.map.checkCollision(this.pos, 20)[0]) {
         this.pos[1]--;
