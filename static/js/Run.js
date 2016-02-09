@@ -63,11 +63,11 @@ var SpriteStorage = function () {
     var sprites = {};
 
     // Get a Sprite from cache or create it
-    this.get = function (path) {
+    this.get = function (path, height, width, frames, speed) {
         if (sprites[path]) {
             return sprites[path];
         } else {
-            sprites[path] = new Sprite(path);
+            sprites[path] = new Sprite(path,height, width, frames, speed);
             return sprites[path];
         }
     }
@@ -88,21 +88,39 @@ var SpriteStorage = function () {
 
 
 // Class for Sprites
-var Sprite = function (path) {
+var Sprite = function (path, width, height, frames, speed) {
     var image = new Image();
     image.src = path;
 
+    var animated = false;
+    var startFrame;
+
+    if (frames) {
+        animated = true;
+        var startFrame = animFrames;
+    }
+
     this.draw = function (ctx, x, y, x2, y2) {
-        if (!x2) x2=image.width;
-        if (!y2) y2=image.height;
-        ctx.drawImage(image, x, y, x2, y2);
+        if (!animated) {
+            if (!x2) x2=image.width;
+            if (!y2) y2=image.height;
+            ctx.drawImage(image, x, y, x2, y2);
+        } else {
+            var curFrame = Math.ceil((animFrames-startFrame) / speed) % frames;
+            if (!x2) x2=width;
+            if (!y2) y2=image.height;
+            var offset = curFrame*width;
+            ctx.drawImage(image, offset, 0, width, image.height, x, y, x2, y2);
+        }
     }
 
     this.getWidth = function () {
+        if (animated) return width;
         return image.width
     }
 
     this.getHeight = function () {
+        if (animated) return image.height;
         return image.height
     }
 }
