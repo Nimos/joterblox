@@ -66,8 +66,8 @@ var Map = function (game, mapname) {
             return powerupSpawns[Math.floor( Math.random() * powerupSpawns.length )];
         } else {
             do {
-                var x = Math.round( Math.random() * this.size[0]-200 )+100;
-                var y = Math.round( Math.random() * this.size[1]-200 )+100;
+                var x = Math.round( Math.random() * (this.size[0]-200) )+100;
+                var y = Math.round( Math.random() * (this.size[1]-200) )+100;
             } while (this.checkCollision([x,y], 20)[1]);
             return [x,y];
         }
@@ -79,8 +79,8 @@ var Map = function (game, mapname) {
             return playerSpawns[Math.floor( Math.random() * playerSpawns.length )];
         } else {
             do {
-                var x = Math.round( Math.random() * this.size[0]-200 )+100;
-                var y = Math.round( Math.random() * this.size[1]-200 )+100;
+                var x = Math.round( Math.random() * (this.size[0]-200) )+100;
+                var y = Math.round( Math.random() * (this.size[1]-200) )+100;
             } while (this.checkCollision([x,y], settings.player.hitBoxSize)[1]);
             return [x,y];
         }
