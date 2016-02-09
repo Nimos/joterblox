@@ -121,6 +121,8 @@ var Game = function () {
             
         }
 
+        this.leader = connections[0];
+
         // Iterate over connections to do connection things
         for (var i=0; i<connections.length; i++) {
             var c = connections[i];
@@ -128,6 +130,11 @@ var Game = function () {
             if (!r) { // remove connection if its update() returns false
                 connections.splice(i--, 1);
                 continue;
+            }
+
+            // Update game leader
+            if (this.leader.score < c.score) {
+                this.leader = c;
             }
         }
 
