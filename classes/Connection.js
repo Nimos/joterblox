@@ -33,6 +33,10 @@ var Connection = function (game, socket) {
     this.score = 0;
     this.joined = false;
 
+    // Personal message / sound queues
+    this.messages = [];
+    this.sounds = [];
+
 
     // Things to do regularily
     this.update = function () {
@@ -61,13 +65,33 @@ var Connection = function (game, socket) {
             timer = game.roundStart+settings.gameServer.waitTime*1000-now;
         }
         // Update player's screen with hud info
-        if (player && player.active) { // User is in the Game, show game screen
-            socket.emit("hud", {"screen": 0, "hp": player.hp, "ping": this.ping, "weapon": player.weapon, "playerX": player.pos[0], "playerY": player.pos[1], "playerColor": player.color, "timeRemaining": timer})
-        } else if (player && !player.active) { // User is dead, show respawn screen
-            socket.emit("hud", {"screen": 1, "hp": 0, "ping": this.ping, "respawn": respawnFrames++, "timeRemaining": timer})
-        } else { // User has not joined yet, show menu
-            socket.emit("hud", {"screen": 2, "hp": 0, "ping": this.ping, "weapon": null})
+
+        var packet = {
+            "ping": this.ping, 
+            "timeRemaining": timer,
+            "messages": this.messages,
+            "sounds": this.sounds
         }
+        if (player && player.active) { // User is in the Game, show game screen
+            packet["screen"] = 0;
+            packet["hp"] = player.hp;
+            packet["weapon"] = player.weapon;
+            packet["playerX"] = player.pos[0];
+            packet["playerY"] = player.pos[1];
+            packet["playerColor"] = player.color;
+        } else if (player && !player.active) { // User is dead, show respawn screen
+            packet["screen"] = 1;
+            packet["hp"] = 0;
+            packet["respawn"] = respawnFrames++;
+            packet["timeRemaining"] = timer;
+        } else { // User has not joined yet, show menu
+            packet["screen"] = 2;
+        }
+        socket.emit("hud", packet);
+
+        // Clear the queues
+        this.messages = [];
+        this.sounds = [];
 
         // Remove from game's connection array
         if (!connected) return 0;

@@ -25,6 +25,10 @@ var cursor = [0, 0];
 // Messages that are displayed
 var messagelog = [];
 
+// Messages and sounds that are about to be displayed
+var messageQueue = [];
+var soundQUeue = [];
+
 // Are we holding tab right now?
 var showScores = false;
 
@@ -54,7 +58,8 @@ var sounds = {
     "death": new Audio("/assets/sounds/death.wav"),
     "shotgun": new Audio("/assets/sounds/shotgun.wav"),
     "join": new Audio("/assets/sounds/join.wav"),
-    "leave": new Audio("/assets/sounds/leave.wav")
+    "leave": new Audio("/assets/sounds/leave.wav"),
+    "cd": new Audio("/assets/sounds/cd.wav")
 };
 
 // Sprites we want to preload
@@ -735,16 +740,18 @@ var handleUpdate = function (s) {
         return;
     }
 
-    // The few things that aren't about drawing...
     // Play sounds in queue
-    for (var i = 0; i < state.sounds.length; i++) {
-        sounds[state.sounds[i]].play();
+    var q = state.sounds.concat(soundQueue);
+    for (var i = 0; i < q.length; i++) {
+        sounds[q[i]].play();
     }
+    soundQueue = [];
 
     // Add messages from message queue to our message log
-    for (var i = 0; i < state.messages.length; i++) {
-        console.log(state.messages[i]); // Always good to have messages in the console.
-        messagelog.push(state.messages[i]);
+    var q = state.messages.concat(messageQueue);
+    for (var i = 0; i < stateq.length; i++) {
+        console.log(q[i]); // Always good to have messages in the console.
+        messagelog.push(q[i]);
         setTimeout("messagelog.shift()", 10000); // Remove new message entry after 10 seconds
     }
 
@@ -775,6 +782,8 @@ var handleUpdate = function (s) {
 // Listener for the hud update event, just updates the global hud variable
 var updateHud = function (data) {
     hud = data;
+    messageQueue.push(data.messages);
+    soundQueue.push(data.sounds);
 }
 
 var connect = function () {
