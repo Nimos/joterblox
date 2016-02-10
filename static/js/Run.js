@@ -349,6 +349,7 @@ var animFrames = 0;
 
 // draw mouse cursor
 var drawCursor = function () {
+    ctx.strokeStyle = "#f0f"
     ctx.strokeRect(cursor[0] - 1, cursor[1] - 1, 2, 2);
     ctx.beginPath();
     ctx.moveTo(cursor[0] + 4, cursor[1] + 4);
@@ -489,7 +490,9 @@ var drawHUD = function (ctx, hud) {
         ctx.fillText(messagelog[i], 10, 15 + 15 * i);
     }
 
-    // Draw buttom bar
+    // Draw bottom bar
+    ctx.fillStyle = "#444";
+    ctx.fillRect(0, c.height - bottomHudHeight, c.width, bottomHudHeight)
     ctx.fillStyle = "black";
     ctx.fillRect(0, c.height - bottomHudHeight, c.width, 2)
 
@@ -623,17 +626,74 @@ var drawScoreboard = function (ctx, state) {
     }
 }
 
-var drawRoundOver = function (ctx, hud) {
-    ctx.fillStyle = "black"
-    ctx.strokeStyle = "white"
+var drawEndscreen = function (ctx) {
+    var roundOverHeight = 480;
+    var roundOverWidth = 800;
+
+    var cornerX = c.width/2 - roundOverWidth/2;
+    var cornerY = c.height/2 - roundOverHeight/2;
+    
+    // Background Box
+    ctx.fillStyle = "rgba(255, 255, 255, 0.6)";
+    ctx.strokeStyle = "#000";
+    ctx.fillRect(c.width/2 - roundOverWidth/2, c.height/2 - roundOverHeight/2, roundOverWidth, roundOverHeight)
+    ctx.lineWidth=4;
+    ctx.strokeRect(c.width/2 - roundOverWidth/2, c.height/2 - roundOverHeight/2, roundOverWidth, roundOverHeight)
+    ctx.lineWidth=1;
+
+    // Scoreboard
+    scoreboard = state.users.sort(function (a, b) {
+        return (b.score - a.score)
+    });
+
+    ctx.font = "24px PressStart2P"
+    ctx.textAlign = "left"
+    ctx.fillStyle = "black";
+    ctx.fillText("Scoreboard", cornerX+8, cornerY+38);
+
+    ctx.font = "8px PressStart2P";
+    var n=0;
+    for (var i = 0; i < scoreboard.length; i++) {
+        s = scoreboard[i];
+        if (s.joined) {
+            ctx.fillText((i-n + 1) + ". " + s.name + ": " + s.score + " points (" + s.ping + " ms)", cornerX+30, 40+cornerY + (1+i-n) * 20);
+        } else {
+            n++;
+        } 
+    }
+    
+
+    // Map Winner
+    ctx.font = "16px PressStart2P";
+    ctx.textAlign = "right";
+    ctx.fillText("This  round goes to...", roundOverWidth+cornerX - 20, cornerY+38);
+    ctx.font = "24px PressStart2P";
     ctx.textAlign = "center"
-    ctx.font = "40px PressStart2P"
-    ctx.fillText("Round over", c.width / 2, 50);
-    ctx.strokeText("Round over", c.width / 2, 50);
+    ctx.fillText(scoreboard[0].name, cornerX+roundOverWidth-195, cornerY+100)
+    
+    
+    // Map Vote    
+    ctx.font = "16px PressStart2P";
+    ctx.textAlign = "right";
+    ctx.fillText("Vote for the next map:", cornerX+roundOverWidth-20, cornerY+200);
+    sprites.draw(ctx, "/assets/images/akirabg.png", cornerX+roundOverWidth-195, cornerY+220, 175, 100)
+    sprites.draw(ctx, "/assets/images/akirabg.png", cornerX+roundOverWidth-375, cornerY+220, 175, 100)
+    sprites.draw(ctx, "/assets/images/akirabg.png", cornerX+roundOverWidth-195, cornerY+325, 175, 100)
+    sprites.draw(ctx, "/assets/images/akirabg.png", cornerX+roundOverWidth-375, cornerY+325, 175, 100)
+
+
+    // Timer
     ctx.font = "24px PressStart2P"
     var s = Math.floor(hud.timeRemaining/1000);
-    ctx.fillText("Next map in "+s+"...", c.width / 2, 80);
-    ctx.strokeText("Next map in "+s+"...", c.width / 2, 80);
+    ctx.textAlign = "right";
+    ctx.fillText("Next map in "+s+"...", cornerX+roundOverWidth-30, cornerY+roundOverHeight-10);
+    
+    // Above Text
+    ctx.fillStyle = "white"
+    ctx.textAlign = "center"
+    ctx.font = "32px PressStart2P";
+    ctx.fillText("Round over", c.width / 2, 50);
+    ctx.strokeText("Round over", c.width / 2, 50);
 
 }
 
@@ -678,7 +738,10 @@ var handleUpdate = function (s) {
     if (hud.screen == 1) drawDeathScreen(ctx, hud);
 
     // Draw the scoreboard if tab is held
-    if (showScores || state.state == 2) drawScoreboard(ctx, state);
+    if (state.state == 2) {
+        drawEndscreen(ctx);
+    } else if (showScores) drawScoreboard(ctx, state);
+
 
     if (state.state == 2) drawRoundOver(ctx, hud);
 

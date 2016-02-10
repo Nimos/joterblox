@@ -57,6 +57,27 @@ var settings = {
         // Options for ping displaying bars
         "colors": ["rgb(255, 0, 0)", "rgb(255, 128, 0)", "rgb(255, 255, 0)", "rgb(0, 255, 0"], // Colors in which to display individual ranges (High to low, 4 only)
         "ranges": [250, 120, 50] // High to low, ranges are infinite-first, ..., last-0 (only 4 ranges possible)
+    },
+
+    "strings": {
+        // Things that are displayed as text
+        "killStreak": [
+            null, //1
+            null, //2
+            "{name} is on a killing-spree!", //3
+            null, //4
+            "{name} is on a rampage!", //5
+            null, //6
+            "Nowhere to hide from {name}!", //7
+            null, //8
+            null, //9
+            "{name} is in mood for genocide!", //10
+            null, //11
+            null, //12
+            "All hope is lost, bow down to {name}" //13
+        ],
+        "multiKillNumbers": [null, "DOUBLE", "TRIPLE", "QUADRA", "PENTA", "HEXA", "HEPTA", "OCTA", "NONA", "DECA"],
+        "multiKill": "{name} SCORED A {number} KILL!"
     }
 }
 

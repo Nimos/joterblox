@@ -11,7 +11,7 @@ var Player = function (game, connection, name, color) {
     var jumpspeed = settings.player.jumpSpeed;
     var gravity = settings.player.gravity;
     var size = settings.player.hitBoxSize;
-    
+
     // Customizations
     this.name = name;
     this.color = color;
@@ -35,6 +35,10 @@ var Player = function (game, connection, name, color) {
     this.type = "player";
     this.state = STANDING;
 
+    var multiKillTimer = -1;
+    var multiKillCount = 0;
+    var killStreak = 0;
+
     var lasthitby =  null;
     this.lasthitby = {"name": "", "weapon": ""};
 
@@ -47,6 +51,22 @@ var Player = function (game, connection, name, color) {
     this.increaseScore = function(number) {
         if (!number) number = 1;
         connection.score += number;
+
+        killStreak++;
+        multiKillCount++;
+        multiKillTimer = 30;
+
+        var numberWords = settings.strings.multiKillNumbers;
+        var message = settings.strings.multiKill;
+
+        if (multiKillCount > 1) game.messages.push(message.replace("{name}", this.name).replace("{number}", numberWords[multiKillCount-1]));
+
+        if (killStreak > 1) {
+            var message = (killStreak <= settings.strings.killStreak.length) ? settings.strings.killStreak[killStreak+1] : settings.strings.killStreak[settings.strings.killStreak.length-1];
+            if (message) {
+                game.messages.push(message.replace("{name}", this.name));
+            }
+        }
     }
 
     this.decreaseScore = function(number) {
@@ -111,6 +131,11 @@ var Player = function (game, connection, name, color) {
         }
 
         game.map.checkBounds(this.pos, size, this);
+
+        // Process Multikills and Killstreaks
+        if (multiKillTimer-- == 0) {
+            multiKillCount = 0;
+        }
 
         // die if we're dead
         if (this.hp <= 0) {
