@@ -1111,7 +1111,7 @@ var titleScreenRefresh = function () {
         ctx.font = "40px PressStart2P";
         ctx.textAlign = "center";
         ctx.fillText("Loading SFX... "+Math.round(sounds.finished*100/sounds.soundCount)+"%", c.width/2, 600);
-        ctx.strokeText("Loading SFX..."+Math.round(sounds.finished*100/sounds.soundCount)+"%", c.width/2, 600);
+        ctx.strokeText("Loading SFX... "+Math.round(sounds.finished*100/sounds.soundCount)+"%", c.width/2, 600);
         ctx.font = "24px PressStart2P";
         ctx.fillText(sounds.currentlyLoading, c.width/2, 650);
         ctx.strokeText(sounds.currentlyLoading, c.width/2, 650);
