@@ -831,11 +831,11 @@ document.onkeydown = function (e) {
     // Do this if an input element is focused
     if (selectedInput) {
         // Valid characters for user input
-        var allowedChars = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0'];
+        var allowedChars = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0'];
 
         // Special characters like äöü don't work with String.fromCharCode
 
-        if (allowedChars.indexOf(String.fromCharCode(e.which).toLowerCase()) != -1) {
+        if (allowedChars.indexOf(String.fromCharCode(e.which)) != -1) {
             // UpperCase only for cool retro pixel feeling
             selectedInput.push(String.fromCharCode(e.which));
         } else if (e.keyCode == "32") {
