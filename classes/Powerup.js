@@ -4,16 +4,16 @@ var settings = require("../settings");
 var Powerup = function (game) {
     // Possible powerup types
     types = settings.powerup.types;
-    // Pick random powerup type
-    this.content = types[Math.floor(Math.random()*types.length)]
 
     // Pick random spawn point
     this.pos = game.map.getPowerupSpawn();
-    // but always move down to the first ground    
-    while (!game.map.checkCollision(this.pos, 20)[1] && !game.map.checkCollision(this.pos, 20)[0]) {
-        this.pos[1]--;
-        if (game.map.checkBounds(this.pos, 20)) break;
-    }
+    if (!this.pos) return;
+
+
+    if (!this.pos[2]) this.pos[2]="random";
+    // Pick powerup type
+    this.content = types[Math.floor(Math.random()*types.length)]
+    if (this.pos[2] != "random") this.content = this.pos[2];
 
     this.active = true;
     this.type = "powerup"

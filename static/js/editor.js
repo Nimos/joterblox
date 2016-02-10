@@ -79,11 +79,14 @@ var draw = function () {
     ctx.strokeRect(s[0]-5, s[1]-5, 10, 10);
   }
 
-  ctx.fillStyle = "#0f0";
   for (var i=0; i<powerups.length; i++) {
     var s = powerups[i];
+    ctx.fillStyle = "#0f0";
     ctx.fillRect(s[0]-10, s[1]-10, 20, 20);
     ctx.strokeRect(s[0]-10, s[1]-10, 20, 20);
+    ctx.fillStyle = "black";
+    ctx.font = "16px sans-serif"
+    ctx.fillText(s[2][0],s[0]-5,s[1]+5);
   }
 
   drawCursor();
@@ -117,7 +120,7 @@ c.addEventListener("mousedown", function(e){
     spawns.push([e.offsetX, e.offsetY]);
   } else if (tool.value == "p") {
     hist.push("p");
-    powerups.push([e.offsetX, e.offsetY]);
+    powerups.push([e.offsetX, e.offsetY,pselect.value]);
   }
   generateResult();
 }, false);
@@ -212,7 +215,7 @@ var generateResult = function () {
 
   result["powerups"] = []
   for (var i=0; i<powerups.length; i++) {
-    var r = [powerups[i][0], powerups[i][1]];
+    var r = [powerups[i][0], powerups[i][1], powerups[i][2]];
     r[1] = height-r[1];
     result["powerups"].push(r);
   }
@@ -270,6 +273,13 @@ bs1.onchange = generateResult;
 bs2.onchange = generateResult;
 bs3.onchange = generateResult;
 
+tool.onchange = function () {
+  if (this.value == "p") {
+    pselectdiv.style = "";
+  } else {
+    pselectdiv.style = "display: none;"
+  }
+}
 
 generateResult();
 draw();

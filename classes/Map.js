@@ -63,13 +63,36 @@ var Map = function (game, mapname) {
     // Returns one of the map's powerup spawns, or picks a random coordinate
     this.getPowerupSpawn = function () {
         if (powerupSpawns.length > 0) {
-            return powerupSpawns[Math.floor( Math.random() * powerupSpawns.length )];
+            // Pick a spawn point that is not taken
+            var freeSpawns = powerupSpawns.slice(0);
+            //console.log(game.actors);
+            for (var n=0; n<game.actors.length; n++) {
+                var a = game.actors[n];
+                if (a.type != "powerup") continue;
+                for (var i=0;i<freeSpawns.length;i++) {
+                    if (freeSpawns[i][0] == a.pos[0] && freeSpawns[i][1] == a.pos[1]) {
+                        freeSpawns.splice(i--, 1);
+                        if (freeSpawns.length == 0) return false;
+                    }
+                }
+                
+            }
+            return freeSpawns[Math.floor( Math.random() * freeSpawns.length )];
+
         } else {
+            // Pick a random starting point that does not collide with anything
             do {
                 var x = Math.round( Math.random() * (this.size[0]-200) )+100;
                 var y = Math.round( Math.random() * (this.size[1]-200) )+100;
             } while (this.checkCollision([x,y], 20)[1]);
-            return [x,y];
+            
+            // Then move down to the ground
+            while (!game.map.checkCollision([x,y], 20)[1]) {
+                y--;
+                if (game.map.checkBounds([x,y], 20)) break; // Don't fall out of the screen tho
+            }
+
+            return [x,y,"random"];
         }
     }
 
