@@ -815,9 +815,6 @@ var handleUpdate = function (s) {
         drawEndscreen(ctx);
     } else if (showScores) drawScoreboard(ctx, state);
 
-
-    if (state.state == 2) drawRoundOver(ctx, hud);
-
     // draw the cursor
     drawCursor();
 }
