@@ -686,10 +686,17 @@ var drawScoreboard = function (ctx, state) {
         s = scoreboard[i];
         if (s.joined && i-n+1 <= 20) {
             ctx.font = "15px PressStart2P";
+
             ctx.fillStyle = "black";
-            ctx.fillText(((i-n + 1) + ordinalString(i-n+1)).makeLength(4, " ", "left") + " " + (s.score+"").makeLength(3, "0", "left") + " " + s.name.makeLength(24, "-"), 230+2, 125+2 + (i-n) * 20);
-            ctx.fillStyle="white";
-            ctx.fillText(((i-n + 1) + ordinalString(i-n+1)).makeLength(4, " ", "left") + " " + (s.score+"").makeLength(3, "0", "left") + " " + s.name.makeLength(24, "-"), 230, 125 + (i-n) * 20);
+            if (s.score >= 0) {
+                ctx.fillText(((i - n + 1) + ordinalString(i - n + 1)).makeLength(4, " ", "left") + " " + (s.score + "").makeLength(3, "0", "left") + " " + s.name.makeLength(24, "-"), 230 + 2, 125 + 2 + (i - n) * 20);
+                ctx.fillStyle = "white";
+                ctx.fillText(((i - n + 1) + ordinalString(i - n + 1)).makeLength(4, " ", "left") + " " + (s.score + "").makeLength(3, "0", "left") + " " + s.name.makeLength(24, "-"), 230, 125 + (i - n) * 20);
+            } else {
+                ctx.fillText(((i - n + 1) + ordinalString(i - n + 1)).makeLength(4, " ", "left") + " -" + (-s.score + "").makeLength(2, "0", "left") + " " + s.name.makeLength(24, "-"), 230 + 2, 125 + 2 + (i - n) * 20);
+                ctx.fillStyle = "white";
+                ctx.fillText(((i - n + 1) + ordinalString(i - n + 1)).makeLength(4, " ", "left") + " -" + (-s.score + "").makeLength(2, "0", "left") + " " + s.name.makeLength(24, "-"), 230, 125 + (i - n) * 20);
+            }
 
             var playerPing = new PingDisplay(ctx, 740, c.height-(123+(i-n)*20), s.ping, 3);
             playerPing.draw();
