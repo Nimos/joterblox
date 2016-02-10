@@ -134,8 +134,10 @@ var Connection = function (game, socket) {
 
     socket.on('disconnect', function (key) {
         connected = false;
-        game.messages.push(settings.strings.playerQuit.replace("{name}", this.name));
-        game.sounds.push("leave");
+        if (self.joined) {
+            game.messages.push(settings.strings.playerQuit.replace("{name}", this.name));
+            game.sounds.push("leave");
+        }
         if (player) {
             player.active = false;
             player.remove = true;
