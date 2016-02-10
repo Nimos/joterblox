@@ -131,6 +131,7 @@ var Player = function (game, connection, name, color) {
         }
 
         game.map.checkBounds(this.pos, size, this);
+        game.map.checkKillzones(this);
 
         // Process Multikills and Killstreaks
         if (multiKillTimer-- == 0) {

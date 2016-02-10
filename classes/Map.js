@@ -4,6 +4,7 @@ var Map = function (game, mapname) {
     // Defining a map as a size and a set of rectangles
     this.rects = [];
     this.size = [0,0];
+    var killZones = [];
 
     this.backgroundImage = null;
     this.foregroundImage = null;
@@ -29,6 +30,7 @@ var Map = function (game, mapname) {
         bounds = m.bounds;
         if (m.powerups) powerupSpawns = m.powerups;
         if (m.spawns) playerSpawns = m.spawns;
+        if (m.killZones) killZones = m.killZones;
 
         return true;
     }
@@ -58,6 +60,21 @@ var Map = function (game, mapname) {
         }
 
         return collides;
+    }
+
+    this.checkKillzones = function (player) {
+        if (killZones.length == 0) return false;
+        
+        var pos = player.pos;
+        var size = settings.player.hitBoxSize;
+
+        for (var i=0;i<killZones.length; i++) {
+            var kz = killZones[i];
+            if (pos[1]-size/2 < kz[1]+kz[3] && pos[1]+size/2 > kz[1] && pos[0]+size/2 > kz[0] && pos[0]-size/2 < kz[0]+kz[2]) {
+                player.hp -= 10;
+                return true;
+            }         
+        }
     }
 
     // Returns one of the map's powerup spawns, or picks a random coordinate
@@ -131,7 +148,6 @@ var Map = function (game, mapname) {
         }
 
         return (r[0] || r[1] || r[2] || r[3]);
-
     }
     if (!mapname) var mapname = settings.map.fallbackMap;
     this.load(mapname);

@@ -45,6 +45,7 @@ var cursor = [0, 0];
 var rects = [];
 var spawns = [];
 var powerups = [];
+var killZones = [];
 var hist = [];
 var ctx = c.getContext("2d")
 var pt = ctx.createPattern(pattern, "repeat");
@@ -60,8 +61,20 @@ var draw = function () {
     var r = rects[i];
     ctx.fillRect(r[0]+2, r[1]+2, r[2], r[3])
   }
+
+  ctx.fillStyle = "rgba(255,0,0,0.5)"
+  for (var i=0; i<killZones.length; i++) {
+    var r = killZones[i];
+    ctx.fillRect(r[0]+2, r[1]+2, r[2], r[3])
+  }
+
+
+  if (tool.value == "c") ctx.fillStyle = pt;
   var r = previewRekt
   ctx.fillRect(r[0], r[1], r[2], r[3])
+  
+
+
   var fs = ["#000", "#00F", "#F00"]
   ctx.fillStyle = fs[bs0.value];
   ctx.fillRect(0,0,c.width,2);
@@ -111,10 +124,9 @@ var dragging = -1;
 var start = [0,0];
 c.addEventListener("mousedown", function(e){
   if (e.button != 0) return 1;
-  if (tool.value == "c") {
+  if (tool.value == "c" || tool.value == "k") {
     start = [e.offsetX, e.offsetY];
     dragging = 0;
-    hist.push("c");
   } else if (tool.value == "s") {
     hist.push("s");
     spawns.push([e.offsetX, e.offsetY]);
@@ -126,7 +138,7 @@ c.addEventListener("mousedown", function(e){
 }, false);
 c.addEventListener("mousemove", function(e){
     cursor = [e.offsetX, e.offsetY];
-    if (tool.value == "c") {
+    if (tool.value == "c" || tool.value == "k") {
       if (dragging != -1) {
         dragging = 1;
       } else {
@@ -138,12 +150,19 @@ c.addEventListener("mousemove", function(e){
     }
 }, false);
 c.addEventListener("mouseup", function(e){
-  if (tool.value == "c") {
+  if (tool.value == "c" || tool.value =="k") {
     var end = [e.offsetX, e.offsetY];
     var rectsize = [end[0]-start[0], end[1]-start[1]]
     previewRekt = [0,0,0,0];
     if(dragging === 1 && Math.abs(rectsize[0]) > 1 && Math.abs(rectsize[1]) > 1){
-        rects.push([start[0]-2, start[1]-2, rectsize[0], rectsize[1]]);
+        var r = ([start[0]-2, start[1]-2, rectsize[0], rectsize[1]]);
+        if (tool.value == "c") {
+          rects.push(r);
+          hist.push("c");
+        } else if (tool.value == "k") {
+          killZones.push(r);
+          hist.push("k");
+        }
         generateResult();
     }
     dragging= -1;
@@ -211,7 +230,21 @@ var generateResult = function () {
     }
     result["rects"].push(r);
   }
-  console.log(result);
+  result["killZones"] = [];
+  for (var i=0; i<killZones.length; i++) {
+    var r = [killZones[i][0], killZones[i][1], killZones[i][2], killZones[i][3]];
+    r[1] = height-r[1];
+    r[3] *= -1;
+    if (r[2] < 0) {
+      r[0]+=r[2];
+      r[2]= r[2]*-1;
+    }
+    if (r[3] < 0) {
+      r[1] += r[3];
+      r[3] = r[3]*-1;
+    }
+    result["killZones"].push(r);
+  }
 
   result["powerups"] = []
   for (var i=0; i<powerups.length; i++) {
@@ -251,6 +284,13 @@ document.getElementById('result').oninput = function (e) {
     r[1] = height-r[1];
     r[3] *= -1;
     rects.push(r);
+  }
+  killZones = [];
+  for (var i=0; i<m.killZones.length; i++) {
+    r=m.killZones[i];
+    r[1] = height-r[1];
+    r[3] *= -1;
+    killZones.push(r);
   }
   powerups = []
   for (var i=0; i<m.powerups.length; i++) {
