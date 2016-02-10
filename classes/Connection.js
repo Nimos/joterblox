@@ -2,6 +2,8 @@ var Player = require("./Player")
 var adds = [];
 var settings = require("../settings");
 
+var curID=0;
+
 var Connection = function (game, socket) {
     // Track Controls
     this.keys = {
@@ -37,6 +39,9 @@ var Connection = function (game, socket) {
     this.messages = [];
     this.sounds = [];
 
+    // unique ID
+    this.uid = curID++;
+
 
     // Things to do regularily
     this.update = function () {
@@ -67,7 +72,8 @@ var Connection = function (game, socket) {
         var hud = {
             "ping": this.ping, 
             "messages": this.messages,
-            "sounds": this.sounds
+            "sounds": this.sounds,
+            "self": this.uid
         }
         if (player && player.active) { // User is in the Game, show game screen
             hud["screen"] = 0;
@@ -138,7 +144,8 @@ var Connection = function (game, socket) {
             "name": this.name,
             "ping": this.ping,
             "score": this.score,
-            "color": color
+            "color": color,
+            "uID": this.uid
         }
     }
 

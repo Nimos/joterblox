@@ -176,7 +176,8 @@ var Player = function (game, connection, name, color) {
             "name": this.name,
             "pos": this.pos,
             "type": this.type,
-            "weaponColor": this.weapon.weaponColor
+            "weaponColor": this.weapon.weaponColor,
+            "uID": connection.uid
         }
         return pack;
     }
