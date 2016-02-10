@@ -30,6 +30,7 @@ var settings = {
 
     "powerup": {
         "types": ["laser", "grenades", "flamethrower","shotgun","medipack"], // which powerup types to randomly spawn
+        "medPackAmount": 25,
     },
 
     "client": {

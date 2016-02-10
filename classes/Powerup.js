@@ -32,7 +32,7 @@ var Powerup = function (game) {
                     // Give new weapon to player
                     a.weapon = new Weapon(game, this.content, a);
                 } else if (this.content == "medipack") {
-                    a.hp += 25;
+                    a.hp += settings.powerup.medPackAmount;
                     a.hp = Math.min(100, a.hp);
                 }
 
