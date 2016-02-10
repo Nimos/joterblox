@@ -305,7 +305,7 @@ var CanvasInput = function (ctx, name, x, y, width) {
     }
 };
 
-var PingDisplay = function(ctx, x, y, size, showText) {
+var PingDisplay = function(ctx, x, y, ping, size, showText) {
     // Coordinate origin is bottom left (thanksmos)
     this.x = x;
     this.y = y;
@@ -317,11 +317,11 @@ var PingDisplay = function(ctx, x, y, size, showText) {
     // Call this to draw me
     this.draw = function() {
         // Set the color based on the range the ping is in
-        if (hud.ping < settings.pingDisplay.ranges[2]) {
+        if (ping < settings.pingDisplay.ranges[2]) {
             this.color = settings.pingDisplay.colors[3];
-        } else if (hud.ping < settings.pingDisplay.ranges[1]) {
+        } else if (ping < settings.pingDisplay.ranges[1]) {
             this.color = settings.pingDisplay.colors[2];
-        } else if (hud.ping < settings.pingDisplay.ranges[0]) {
+        } else if (ping < settings.pingDisplay.ranges[0]) {
             this.color = settings.pingDisplay.colors[1];
         } else {
             this.color = settings.pingDisplay.colors[0];
@@ -343,17 +343,17 @@ var PingDisplay = function(ctx, x, y, size, showText) {
             ctx.fillRect(this.x + 0 * this.size * 1.5, c.height - this.y - this.size - this.size * 0, this.size * 0.9, 1 * this.size);
 
         // Fill second bar if ping is lower than worst
-        if (hud.ping < settings.pingDisplay.ranges[0]) { //
+        if (ping < settings.pingDisplay.ranges[0]) { //
             ctx.fillRect(this.x + 1 * this.size * 1.5, c.height - this.y - this.size - this.size * 1, this.size * 0.9, 2 * this.size);
         }
 
         // Fill third bar if ping is okay but not perfect
-        if (hud.ping < settings.pingDisplay.ranges[1]) {
+        if (ping < settings.pingDisplay.ranges[1]) {
             ctx.fillRect(this.x + 2 * this.size * 1.5, c.height - this.y - this.size - this.size * 2, this.size * 0.9, 3 * this.size);
         }
 
         // Fill fourth bar if ping is really good
-        if (hud.ping < settings.pingDisplay.ranges[2]) {
+        if (ping < settings.pingDisplay.ranges[2]) {
             ctx.fillRect(this.x + 3 * this.size * 1.5, c.height - this.y - this.size - this.size * 3, this.size * 0.9, 4 * this.size);
         }
 
@@ -361,9 +361,9 @@ var PingDisplay = function(ctx, x, y, size, showText) {
         if (this.showText) {
             ctx.textAlign = "left";
             ctx.strokeStyle = "black";
-            ctx.strokeText(hud.ping, this.x + 5 * this.size * 1.5, c.height - this.y);
+            ctx.strokeText(ping, this.x + 5 * this.size * 1.5, c.height - this.y);
             ctx.fillStyle = this.color;
-            ctx.fillText(hud.ping, this.x + 5 * this.size * 1.5, c.height - this.y);
+            ctx.fillText(ping, this.x + 5 * this.size * 1.5, c.height - this.y);
         }
     }
 };
@@ -528,8 +528,8 @@ var drawHUD = function (ctx, hud) {
     ctx.font = "16px PressStart2P"
     ctx.textAlign = "start";
 
-    var ping = new PingDisplay(ctx, 10, 10, 4, true);
-    ping.draw();
+    var mainPingDisplay = new PingDisplay(ctx, 10, 10, hud.ping, 4, true);
+    mainPingDisplay.draw();
 
     //HP Bar
     ctx.fillStyle = hudHpColor2;
@@ -698,9 +698,8 @@ var drawScoreboard = function (ctx, state) {
             ctx.fillStyle="white";
             ctx.fillText(((i-n + 1) + ordinalString(i-n+1)).makeLength(4, " ", "left") + " " + (s.score+"").makeLength(3, "0") + " " + s.name.makeLength(24, "-"), 230, 125 + (i-n) * 20);
 
-            // TODO Change to player ping
-            var ping = new PingDisplay(ctx, 740, c.height-(123+(i-n)*20), 3);
-            ping.draw();
+            var playerPing = new PingDisplay(ctx, 740, c.height-(123+(i-n)*20), s.ping, 3);
+            playerPing.draw();
         } else {
             n++;
         }
@@ -824,9 +823,6 @@ var handleUpdate = function (s) {
     if (state.state == 2) {
         drawEndscreen(ctx);
     } else if (showScores) drawScoreboard(ctx, state);
-
-
-    if (state.state == 2) drawRoundOver(ctx, hud);
 
     // draw the cursor
     drawCursor();
