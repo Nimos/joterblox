@@ -49,7 +49,7 @@ var connecting = false;
 var sock;
 
 // Load resources
-var sounds = {
+/*var sounds = {
     "powerup": new Audio("/assets/sounds/powerup.wav"),
     "laser": new Audio("/assets/sounds/laser.wav"),
     "explosion": new Audio("/assets/sounds/explosion.wav"),
@@ -60,14 +60,86 @@ var sounds = {
     "join": new Audio("/assets/sounds/join.wav"),
     "leave": new Audio("/assets/sounds/leave.wav"),
     "cd": new Audio("/assets/sounds/cd.wav")
-};
+};*/
 
 // Sprites we want to preload
-var preload = ["/assets/images/title.jpg", "/assets/images/cover.jpg", "/assets/images/entername.png", "/assets/images/akirabg.png", "/assets/images/akirafg.png"];
+var gfxpreload = [
+    "/assets/images/title.jpg", 
+    "/assets/images/cover.jpg", 
+    "/assets/images/entername.png", 
+    "/assets/images/akirabg.png", 
+    "/assets/images/akirafg.png"
+];
+
+var sfxpreload = [
+    ["powerup", "/assets/sounds/powerup.wav"],
+    ["laser", "/assets/sounds/laser.wav"],
+    ["explosion", "/assets/sounds/explosion.wav"],
+    ["normalshot", "/assets/sounds/normalshot.wav"],
+    ["flame", "/assets/sounds/flame.wav"],
+    ["death", "/assets/sounds/death.wav"],
+    ["shotgun", "/assets/sounds/shotgun.wav"],
+    ["join", "/assets/sounds/join.wav"],
+    ["leave", "/assets/sounds/leave.wav"],
+    ["cd", "/assets/sounds/cd.wav"]
+]
+
+var SFXStorage = function (preload) {
+    var sounds = {};
+    this.soundCount = 0;
+    this.finished = -1;
+    this.currentlyLoading = "";
+
+    this.get = function(name, path) {
+        if (sounds[name]) {
+            return sounds[name];
+        } else if (path) {
+            sounds[name] = new Audio(path);
+            return sounds[name];
+        } else {
+            return null;
+        }
+    }
+    
+    this.loaded = function () {
+        return this.finished >= this.soundCount;
+    }
+
+    this.play = function(path) {
+        this.get(path).play()
+    }
+
+    var loadNext = function() {
+        this.finished++;
+        console.log(this.queue);
+        if (this.queue.length == 0) return;
+        var path = this.queue.pop();
+        console.log("Loading sounds... ",path, Math.round(this.finished*100/this.soundCount), "%")
+        sounds[path[0]] = new Audio(path[1]);
+        sounds[path[0]].onloadeddata = loadNext.bind(this);
+        this.currentlyLoading = path[1];
+    }
+
+    if (preload) {
+        this.soundCount = preload.length;
+        this.queue = preload;
+        loadNext.bind(this)();
+    }
+}
+
+sounds = new SFXStorage(sfxpreload);
 
 //Class to manage sprites
-var SpriteStorage = function () {
+var SpriteStorage = function (preload) {
     var sprites = {};
+
+    this.spriteCount = 0;
+    this.finished = -1;
+    this.currentlyLoading = "";
+
+    this.loaded = function () {
+        return this.finished >= this.spriteCount;
+    }
 
     // Get a Sprite from cache or create it
     this.get = function (path, height, width, frames, speed) {
@@ -84,10 +156,26 @@ var SpriteStorage = function () {
         return this.get(path).draw(ctx, x, y, x2, y2);
     }
 
-    if (preload) {
-        for (var i=0;i<preload.length; i++) {
-            this.get(preload[i]);
+
+    // Load the preload queue
+    var loadNext = function() {
+        this.finished++;
+        if (this.queue.length == 0) return;
+        var path = this.queue.shift();
+        if (typeof path != "object") {
+            sprites[path] = new Sprite(path);
+            this.currentlyLoading = path;
+        } else {
+            sprites[path] = new Sprite(path[0], path[1], path[2], path[3], path[4])
+            this.currentlyLoading = path[0];
         }
+        sprites[path].load = loadNext.bind(this);
+    }
+
+    if (preload) {
+        this.spriteCount = preload.length;
+        this.queue = preload;
+        loadNext.bind(this)();
     }
 
 }
@@ -96,8 +184,6 @@ var SpriteStorage = function () {
 
 // Class for Sprites
 var Sprite = function (path, width, height, frames, speed) {
-    var image = new Image();
-    image.src = path;
 
     var animated = false;
     var startFrame;
@@ -106,6 +192,16 @@ var Sprite = function (path, width, height, frames, speed) {
         animated = true;
         var startFrame = animFrames;
     }
+
+    this.load = function () {console.log("HIHIHIHI")};
+    this.onload = function () {
+        console.log(image);
+        this.load();
+    }
+
+    var image = new Image();
+    image.onload  = this.onload.bind(this);
+    image.src = path;
 
     this.draw = function (ctx, x, y, x2, y2) {
         if (!animated) {
@@ -132,7 +228,7 @@ var Sprite = function (path, width, height, frames, speed) {
     }
 }
 
-var sprites = new SpriteStorage(preload);
+var sprites = new SpriteStorage(gfxpreload);
 
 // Shifting color used for powerups;
 var rainbowAnimation = function () {
@@ -803,7 +899,7 @@ var handleUpdate = function (s) {
     // Play sounds in queue
     var q = s.sounds;
     for (var i = 0; i < q.length; i++) {
-        sounds[q[i]].play();
+        sounds.play(q[i]);
     }
 
     // Add messages from message queue to our message log
@@ -987,16 +1083,45 @@ document.onkeyup = function (e) {
 
 // Draw pre-connect screen
 var titleScreenRefresh = function () {
-    if (connecting) {
-        connect();
-    }
 
     animFrames++; // we're not running onUpdate, so increment them here
     c.width = settings.client.mainMenuWidth;
     c.height = settings.client.mainMenuHeight;
     ctx.clearRect(0,0,c.width, c.height);
 
-    sprites.draw(ctx, "/assets/images/title.jpg", 0, 0, c.width, c.height);
+    ctx.fillStyle = "black";
+    ctx.fillRect(0,0,c.width,c.height);
+    
+    if (sprites.finished > 0) sprites.draw(ctx, "/assets/images/title.jpg", 0, 0, c.width, c.height);
+    
+    if (!sprites.loaded() && !sounds.loaded()) {
+        ctx.fillStyle = "#fff"
+        ctx.strokeStyle = "#000"
+        ctx.font = "40px PressStart2P";
+        ctx.textAlign = "center";
+        ctx.fillText("Loading GFX... "+Math.round(sprites.finished*100/sprites.spriteCount)+"%", c.width/2, 600);
+        ctx.strokeText("Loading GFX... "+Math.round(sprites.finished*100/sprites.spriteCount)+"%", c.width/2, 600);
+        ctx.font = "24px PressStart2P";
+        ctx.fillText(sprites.currentlyLoading, c.width/2, 650);
+        ctx.strokeText(sprites.currentlyLoading, c.width/2, 650);
+    }
+    if (sprites.loaded() && !sounds.loaded()) {
+        ctx.fillStyle = "#fff"
+        ctx.strokeStyle = "#000"
+        ctx.font = "40px PressStart2P";
+        ctx.textAlign = "center";
+        ctx.fillText("Loading SFX... "+Math.round(sounds.finished*100/sounds.soundCount)+"%", c.width/2, 600);
+        ctx.strokeText("Loading SFX..."+Math.round(sounds.finished*100/sounds.soundCount)+"%", c.width/2, 600);
+        ctx.font = "24px PressStart2P";
+        ctx.fillText(sounds.currentlyLoading, c.width/2, 650);
+        ctx.strokeText(sounds.currentlyLoading, c.width/2, 650);
+    }
+    
+    if (!sprites.loaded() || !sounds.loaded()) return;
+    if (connecting) {
+        connect();
+    }
+
     if (animFrames % 50 < 25) {
         ctx.fillStyle = "#fff"
         ctx.strokeStyle = "#000"
