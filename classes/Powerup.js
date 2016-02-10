@@ -28,8 +28,13 @@ var Powerup = function (game) {
             // Check pickup based on distance for simplicity
             var dist = Math.sqrt(Math.pow(this.pos[0]-a.pos[0], 2)+Math.pow(this.pos[1]-a.pos[1], 2))
             if (dist < 5+20) {
-                // Give new weapon to player
-                a.weapon = new Weapon(game, this.content, a);
+                if (this.content != "medipack") {
+                    // Give new weapon to player
+                    a.weapon = new Weapon(game, this.content, a);
+                } else if (this.content == "medipack") {
+                    a.hp += 25;
+                    a.hp = Math.min(100, a.hp);
+                }
 
                 // Pickup sound
                 game.sounds.push("powerup");

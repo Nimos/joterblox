@@ -473,7 +473,10 @@ var drawActors = function (ctx, state) {
                 ctx.fillText("L", a.pos[0] - 10, state.map.size[1] - a.pos[1] + 8);
             } else if (a.content == "shotgun") {
                 ctx.fillText("S", a.pos[0] - 10, state.map.size[1] - a.pos[1] + 8);
+            } else if (a.content == "medipack") {
+                ctx.fillText("M", a.pos[0] - 10, state.map.size[1] - a.pos[1] + 8);
             }
+
 
 
         } else if (a.type == "effect") {
