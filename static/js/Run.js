@@ -624,23 +624,76 @@ var drawDeathScreen = function (ctx, hud) {
     }
 }
 
+// 1 -> 1st, 2 -> 2nd and so on for all positive numbers
+var ordinalString = function(number) {
+    if (number%100 == 11 || number%100 == 12 || number%100 == 13)   // Number ends with ..
+        return "th";
+    if (number%10 == 1)
+        return "st";
+    if (number%10 == 2)
+        return "nd";
+    if (number%10 == 3)
+        return "rd";
+    return "th"
+};
+
+// Set a String to a specific length (only good with monospace fonts)
+String.prototype.makeLength = function(length, fillChar, changeSide) {
+    // Wow, error handling!
+    if (!length)
+        throw new Error("Missing parameter: length");
+
+    // Let's go
+    fillChar = fillChar || " "; // Set whitespace as default if no value is given
+    changeSide = changeSide || "right"; // default: add trailing whitespace or cut the right side off
+
+    if(this.toString().length >= length) {
+        // String has to be cut off
+        if (changeSide == "left") {
+            return this.toString().substring(this.toString().length-length, this.toString().length);
+        } else if (changeSide == "right") {
+            return this.toString().substring(0, length);
+        }
+    } else {
+        // We need the fillChar
+        var retStr = this.toString();
+        for (var i = this.toString().length; i < length; i++) {
+            if (changeSide == "right") {
+                retStr = retStr + fillChar;
+            } else if (changeSide == "left") {
+                retStr = fillChar + retStr;
+            }
+        }
+        return retStr;
+    }
+};
+
 var scoreboard;
 var drawScoreboard = function (ctx, state) {
     scoreboard = state.users.sort(function (a, b) {
         return (b.score - a.score)
     });
-    ctx.fillStyle = "rgba(255,255,255,0.6)";
-    ctx.fillRect(100, 100, c.width - 200, c.height - 200);
-    ctx.strokeStyle = "#000"
-    ctx.strokeRect(100, 100, c.width - 200, c.height - 200);
-    ctx.fillStyle = "black";
+    ctx.fillStyle = "rgba(40,40,40,0.8)";
+    ctx.fillRect(200, 100, c.width - 400, c.height - 200);
+    ctx.strokeStyle = "#000";
+    ctx.strokeRect(200, 100, c.width - 400, c.height - 200);
+    //ctx.fillStyle = "white";
     ctx.textAlign = "start";
-    ctx.font = "15px sans-serif";
+    ctx.font = "15px PressStart2P";
     var n = 0;
+
     for (var i = 0; i < scoreboard.length; i++) {
         s = scoreboard[i];
-        if (s.joined) {
-            ctx.fillText((i-n + 1) + ". " + s.name + ": " + s.score + " points (" + s.ping + " ms)", 105, 115 + (i-n) * 20);
+        if (s.joined && i-n+1 <= 20) {
+            ctx.font = "15px PressStart2P";
+            ctx.fillStyle = "black";
+            ctx.fillText(((i-n + 1) + ordinalString(i-n+1)).makeLength(4, " ", "left") + " " + (s.score+"").makeLength(3, "0") + " " + s.name.makeLength(24, "-"), 230+2, 125+2 + (i-n) * 20);
+            ctx.fillStyle="white";
+            ctx.fillText(((i-n + 1) + ordinalString(i-n+1)).makeLength(4, " ", "left") + " " + (s.score+"").makeLength(3, "0") + " " + s.name.makeLength(24, "-"), 230, 125 + (i-n) * 20);
+
+            // TODO Change to player ping
+            var ping = new PingDisplay(ctx, 740, c.height-(123+(i-n)*20), 3);
+            ping.draw();
         } else {
             n++;
         }
