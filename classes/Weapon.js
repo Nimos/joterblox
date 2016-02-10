@@ -237,8 +237,6 @@ var Weapon = function (game, name, owner) {
             }
         }
     }
-
-
 }
 
 

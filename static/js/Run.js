@@ -17,7 +17,7 @@ var hudBarFont = settings.client.hudBarFont;
 var ctx = c.getContext("2d")
 
 // this will hold the current game state
-var state;
+var state, map, hud;
 
 // cursor coordinates
 var cursor = [0, 0];
@@ -416,24 +416,24 @@ var drawMenu = function () {
 }
 
 var drawMapBG = function (ctx, state) {
-    c.width = state.map.size[0];
-    c.height = state.map.size[1] + bottomHudHeight;
+    c.width = map.size[0];
+    c.height = map.size[1] + bottomHudHeight;
 
-    for (var i = 0; i < state.map.rects.length; i++) {
-        var r = state.map.rects[i];
+    for (var i = 0; i < map.rects.length; i++) {
+        var r = map.rects[i];
         ctx.fillStyle = "black";
-        ctx.fillRect(r[0], state.map.size[1] - r[1] - r[3], r[2], r[3])
+        ctx.fillRect(r[0], map.size[1] - r[1] - r[3], r[2], r[3])
     }
 
-    if (state.map.backgroundImage) {
-        sprites.draw(ctx,state.map.backgroundImage, 0,0);
+    if (map.backgroundImage) {
+        sprites.draw(ctx,map.backgroundImage, 0,0);
     }
     
 }
 
 var drawMapFG = function (ctx, state) {
-     if (state.map.foregroundImage) {
-        sprites.draw(ctx,state.map.foregroundImage, 0,0);
+     if (map.foregroundImage) {
+        sprites.draw(ctx,map.foregroundImage, 0,0);
     }   
 }
 
@@ -444,28 +444,28 @@ var drawActors = function (ctx, state) {
             var pSize = settings.player.hitBoxSize;
             // Draw Player
             // Edges by weapon color
-            ctx.fillStyle = a.weapon.weaponColor;
-            ctx.fillRect(a.pos[0] - pSize/2, state.map.size[1] - a.pos[1] - pSize/2, pSize, pSize)
+            ctx.fillStyle = a.weaponColor;
+            ctx.fillRect(a.pos[0] - pSize/2, map.size[1] - a.pos[1] - pSize/2, pSize, pSize)
             // Center by player color
             ctx.fillStyle = "rgb(" + a.color[0] + "," + a.color[1] + "," + a.color[2] + ")";
-            ctx.fillRect(a.pos[0] - pSize/3, state.map.size[1] - a.pos[1] - pSize/3, 2*pSize/3, 2*pSize/3)
+            ctx.fillRect(a.pos[0] - pSize/3, map.size[1] - a.pos[1] - pSize/3, 2*pSize/3, 2*pSize/3)
 
             ctx.textAlign = "center";
             ctx.font = "10px sans-serif"
             ctx.fillStyle = "black";
-            ctx.fillText(a.name, a.pos[0], state.map.size[1] - (a.pos[1] + 20));
-            ctx.fillRect(a.pos[0] - 10, state.map.size[1] - (a.pos[1] + 15), 20, 5)
+            ctx.fillText(a.name, a.pos[0], map.size[1] - (a.pos[1] + 20));
+            ctx.fillRect(a.pos[0] - 10, map.size[1] - (a.pos[1] + 15), 20, 5)
             ctx.fillStyle = "#00CC00";
-            ctx.fillRect(a.pos[0] - 9, state.map.size[1] - (a.pos[1] + 14), 18 * (a.hp / 100), 3)
+            ctx.fillRect(a.pos[0] - 9, map.size[1] - (a.pos[1] + 14), 18 * (a.hp / 100), 3)
         } else if (a.type == "bullet") {
             // Draw Bullet
             ctx.fillStyle = a.weapon.bulletColor;
-            ctx.fillRect(a.pos[0] - a.weapon.bulletSize / 2, state.map.size[1] - a.pos[1] - a.weapon.bulletSize / 2, a.weapon.bulletSize, a.weapon.bulletSize)
+            ctx.fillRect(a.pos[0] - a.weapon.bulletSize / 2, map.size[1] - a.pos[1] - a.weapon.bulletSize / 2, a.weapon.bulletSize, a.weapon.bulletSize)
 
         } else if (a.type == "powerup") {
             // Draw powerup as rainbow colored block
             ctx.fillStyle = rainbow.getColor();
-            ctx.fillRect(a.pos[0] - 10, state.map.size[1] - a.pos[1] - 10, 20, 20);
+            ctx.fillRect(a.pos[0] - 10, map.size[1] - a.pos[1] - 10, 20, 20);
 
             // Then add letter describing what's in it
             ctx.textAlign = "left"
@@ -473,15 +473,15 @@ var drawActors = function (ctx, state) {
             ctx.font = "20px sans-serif"
             ctx.fontSize = 20;
             if (a.content == "flamethrower") {
-                ctx.fillText("F", a.pos[0] - 10, state.map.size[1] - a.pos[1] + 8);
+                ctx.fillText("F", a.pos[0] - 10, map.size[1] - a.pos[1] + 8);
             } else if (a.content == "grenades") {
-                ctx.fillText("G", a.pos[0] - 10, state.map.size[1] - a.pos[1] + 8);
+                ctx.fillText("G", a.pos[0] - 10, map.size[1] - a.pos[1] + 8);
             } else if (a.content == "laser") {
-                ctx.fillText("L", a.pos[0] - 10, state.map.size[1] - a.pos[1] + 8);
+                ctx.fillText("L", a.pos[0] - 10, map.size[1] - a.pos[1] + 8);
             } else if (a.content == "shotgun") {
-                ctx.fillText("S", a.pos[0] - 10, state.map.size[1] - a.pos[1] + 8);
+                ctx.fillText("S", a.pos[0] - 10, map.size[1] - a.pos[1] + 8);
             } else if (a.content == "medipack") {
-                ctx.fillText("M", a.pos[0] - 10, state.map.size[1] - a.pos[1] + 8);
+                ctx.fillText("M", a.pos[0] - 10, map.size[1] - a.pos[1] + 8);
             }
 
 
@@ -493,15 +493,15 @@ var drawActors = function (ctx, state) {
                 // Laser is a blue line
                 ctx.strokeStyle = "#2222FF";
                 ctx.beginPath();
-                ctx.moveTo(a.pos1[0], state.map.size[1] - a.pos1[1]);
-                ctx.lineTo(a.pos2[0], state.map.size[1] - a.pos2[1]);
+                ctx.moveTo(a.pos1[0], map.size[1] - a.pos1[1]);
+                ctx.lineTo(a.pos2[0], map.size[1] - a.pos2[1]);
                 ctx.stroke()
 
             } else if (a.name == "explosion") {
                 // Explosion is an orange circle
                 ctx.fillStyle = "rgba(255,127,0, 0.5)"
                 ctx.beginPath();
-                ctx.arc(a.pos1[0], state.map.size[1] - a.pos1[1], 60, 0, 2 * Math.PI);
+                ctx.arc(a.pos1[0], map.size[1] - a.pos1[1], 60, 0, 2 * Math.PI);
                 ctx.fill();
             }
 
@@ -585,7 +585,7 @@ var drawHUD = function (ctx, hud) {
             ctx.font = "15px sans-serif";
             ctx.textAlign = "center";
             ctx.fillStyle = "rgb(" + hud.playerColor[0] + "," + hud.playerColor[1] + "," + hud.playerColor[2] + ")";
-            hud.playerY = state.map.size[1] - hud.playerY; // 80%
+            hud.playerY = map.size[1] - hud.playerY; // 80%
             ctx.fillText("▼", hud.playerX, hud.playerY - 30);
             ctx.strokeStyle = "black";
             ctx.strokeText("▼", hud.playerX, hud.playerY - 30);
@@ -790,7 +790,8 @@ var handleUpdate = function (s) {
     // This loop is taking over, end the other one
     clearInterval(titleScreenInterval)
     
-    state = s;
+    hud = s["hud"]
+    state = s["game"];
     animFrames++;
 
     if (hud.screen == 2) {// We aren't in game yet, so draw the menu
@@ -800,14 +801,13 @@ var handleUpdate = function (s) {
     }
 
     // Play sounds in queue
-    var q = state.sounds.concat(soundQueue);
+    var q = s.sounds;
     for (var i = 0; i < q.length; i++) {
         sounds[q[i]].play();
     }
-    soundQueue = [];
 
     // Add messages from message queue to our message log
-    var q = state.messages.concat(messageQueue);
+    var q = s.messages;
     for (var i = 0; i < q.length; i++) {
         console.log(q[i]); // Always good to have messages in the console.
         messagelog.push(q[i]);
@@ -835,11 +835,8 @@ var handleUpdate = function (s) {
     drawCursor();
 }
 
-// Listener for the hud update event, just updates the global hud variable
-var updateHud = function (data) {
-    hud = data;
-    messageQueue = messageQueue.concat(data.messages);
-    soundQueue = soundQueue.concat(data.sounds);
+var loadMap = function (e) {
+    map = e;
 }
 
 var connect = function () {
@@ -848,7 +845,7 @@ var connect = function () {
     // Open the socket and add listeners
     sock = io(window.location.hostname+":"+settings.gameServer.port);
     sock.on("update", handleUpdate);
-    sock.on("hud", updateHud);
+    sock.on("loadMap", loadMap);
 
     // I had weird problems naming those "ping" and "pong", maybe socket.io internally uses those? they disappeared after I renamed them to that
     sock.on("pung", function (time) {
@@ -866,7 +863,10 @@ var connect = function () {
 // Add event listeners for inputs
 // I'm sure I could get away with only updating the cursor when the mouse is clicked, but I didn't have any bandwidth issues yet...
 c.onmousemove = function (e) {
-    if (sock) sock.emit("mousemove", [e.offsetX, state.map.size[1] - e.offsetY])
+    var y = c.height;
+    if (map) y=map.size[1];
+
+    if (sock) sock.emit("mousemove", [e.offsetX, y - e.offsetY])
     cursor = [e.offsetX, e.offsetY]
     stopEvent(e);
 }

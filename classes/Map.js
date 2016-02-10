@@ -149,6 +149,16 @@ var Map = function (game, mapname) {
 
         return (r[0] || r[1] || r[2] || r[3]);
     }
+
+    this.pack = function () {
+        return {
+            "backgroundImage": this.backgroundImage,
+            "foregroundImage": this.foregroundImage,
+            "rects": this.rects,
+            "size": this.size
+        }
+    }
+
     if (!mapname) var mapname = settings.map.fallbackMap;
     this.load(mapname);
 }

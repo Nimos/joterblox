@@ -56,47 +56,46 @@ var Connection = function (game, socket) {
                 socket.emit("pung", (new Date()).getTime());
             }
         }
-
-        var now = (new Date).getTime();
-        var timer;
-        if (game.state == 1) {
-            timer = game.roundStart+settings.gameServer.roundTimer*1000-now;
-        } else if (game.state == 2) {
-            timer = game.roundStart+settings.gameServer.waitTime*1000-now;
-        }
-        // Update player's screen with hud info
-
-        var packet = {
-            "ping": this.ping, 
-            "timeRemaining": timer,
-            "messages": this.messages,
-            "sounds": this.sounds
-        }
-        if (player && player.active) { // User is in the Game, show game screen
-            packet["screen"] = 0;
-            packet["hp"] = player.hp;
-            packet["weapon"] = player.weapon;
-            packet["playerX"] = player.pos[0];
-            packet["playerY"] = player.pos[1];
-            packet["playerColor"] = player.color;
-        } else if (player && !player.active) { // User is dead, show respawn screen
-            packet["screen"] = 1;
-            packet["hp"] = 0;
-            packet["respawn"] = respawnFrames++;
-            packet["timeRemaining"] = timer;
-        } else { // User has not joined yet, show menu
-            packet["screen"] = 2;
-        }
-        socket.emit("hud", packet);
-
-        // Clear the queues
-        this.messages = [];
-        this.sounds = [];
-
         // Remove from game's connection array
         if (!connected) return 0;
 
         return 1;
+    }
+
+    this.sendUpdate = function (packet) {
+       // Update player's screen with new info
+        var hud = {
+            "ping": this.ping, 
+            "messages": this.messages,
+            "sounds": this.sounds
+        }
+        if (player && player.active) { // User is in the Game, show game screen
+            hud["screen"] = 0;
+            hud["hp"] = player.hp;
+            hud["weapon"] = {
+                "ammo": player.weapon.ammo, 
+                "ammoRecharge": player.weapon.ammoRecharge, 
+                "fireRate": player.weapon.fireRate, 
+                "cooldown": player.weapon.cooldown, 
+                "maxAmmo": player.weapon.maxAmmo, 
+                "ammoTicks": player.weapon.ammoTicks
+            };
+        } else if (player && !player.active) { // User is dead, show respawn screen
+            hud["screen"] = 1;
+            hud["hp"] = 0;
+            hud["respawn"] = respawnFrames++;
+        } else { // User has not joined yet, show menu
+            hud["screen"] = 2;
+        }
+
+        packet["hud"] = hud;
+        packet["messages"] = game.messages.concat(this.messages);
+        packet["sounds"] = game.sounds.concat(this.sounds);
+        socket.emit("update", packet);
+
+        // Clear the queues
+        this.messages = [];
+        this.sounds = [];
     }
 
     // Called when a round is restarted
@@ -131,6 +130,16 @@ var Connection = function (game, socket) {
             game.sounds.push("join");
         }
         self.joined = true;
+    }
+
+    this.pack = function () {
+        return {
+            "joined": this.joined,
+            "name": this.name,
+            "ping": this.ping,
+            "score": this.score,
+            "color": color
+        }
     }
 
 
@@ -192,6 +201,8 @@ var Connection = function (game, socket) {
     socket.on('mousemove', function (cords) {
         self.cursor = cords;
     });
+
+    socket.emit("loadMap", game.map.pack())
 
     // Add this object to the connection array
     game.addConnection(this);

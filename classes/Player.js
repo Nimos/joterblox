@@ -169,6 +169,18 @@ var Player = function (game, connection, name, color) {
         return 1;
     }
 
+    this.pack = function () {
+        var pack = {
+            "color": this.color,
+            "hp": this.hp,
+            "name": this.name,
+            "pos": this.pos,
+            "type": this.type,
+            "weaponColor": this.weapon.weaponColor
+        }
+        return pack;
+    }
+
     // add this to actors list
     game.addActor(this);
 

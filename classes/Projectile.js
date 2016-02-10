@@ -66,6 +66,17 @@ var Projectile = function (game, pos, target, myWeapon, myOwner) {
         return 1;
     }
 
+    this.pack = function () {
+        return {
+            "pos": this.pos,
+            "type": this.type,
+            "weapon": {
+                "bulletSize": this.weapon.bulletSize,
+                "bulletColor": this.weapon.bulletColor
+            }
+        }
+    }
+
     game.addActor(this); // Add to actors array
 }
 

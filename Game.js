@@ -86,6 +86,15 @@ var Game = function () {
         // Measuring tick time to track performance issues
         var stopwatch = (new Date()).getTime()
 
+        // Create an object that we will send to clients
+        var update = {
+            "hud": {},
+            "game": {
+                "actors": [],
+                "users": []
+            }
+        }
+
         if (this.state == 1) {
             // Iterate over actors to do actor things
             for (var i=0; i<actors.length; i++) {
@@ -100,8 +109,9 @@ var Game = function () {
                     actors.splice(i--, 1);
                     continue;
                 }
-            }
 
+                update["game"]["actors"].push(actors[i].pack())
+            }
 
             // Add a new powerup every 100 ticks, up to maximum of 3
             powerupcounter %= 100;
@@ -112,8 +122,6 @@ var Game = function () {
                 }
 
             }
-
-            
         }
 
         this.leader = connections[0];
@@ -131,15 +139,33 @@ var Game = function () {
             if (this.leader.score < c.score) {
                 this.leader = c;
             }
+
+            update["game"]["users"].push(c.pack());
+        }
+        
+        // Get the remaining time of the current round
+        var now = (new Date).getTime();
+        var timer;
+        if (this.state == 1) {
+            timer = this.roundStart+settings.gameServer.roundTimer*1000-now;
+        } else if (this.state == 2) {
+            timer = this.roundStart+settings.gameServer.waitTime*1000-now;
+        } else {
+            timer = 0;
         }
 
         // Output the message queue to console as well
         for (var i=0; i<this.messages.length; i++) console.log("[Game]", this.messages[i]);
 
         // Wrap up all the important things in an object and send it to clients
-        var gameState = {"map": this.map, "actors": actors, "sounds": this.sounds, "messages": this.messages, "users": connections, "state": this.state}
-        io.emit('update', gameState);
-        
+        update["game"]["state"] = this.state;
+        update["game"]["timeRemaining"] = timer;
+
+        // Send updated game state to users
+        for (var i=0; i<connections.length; i++) {
+            connections[i].sendUpdate(update);
+        }  
+
         // Reset our sound and message queue
         this.sounds = [];
         this.messages = [];
@@ -164,6 +190,7 @@ var Game = function () {
         }
 
         this.map = new Map(this, map);
+        io.emit("loadMap", this.map);
         actors = [];
         this.actors = actors;
         powerupcounter = 0;

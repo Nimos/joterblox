@@ -12,6 +12,15 @@ var Effect = function (game, name, duration, pos1, pos2) {
     this.pos2 = pos2;
 
     game.addActor(this);
+
+    this.pack = function () {
+        return {
+            "pos1": this.pos1,
+            "pos2": this.pos2,
+            "name": this.name,
+            "type": this.type
+        }
+    }
 }
 
 module.exports = Effect

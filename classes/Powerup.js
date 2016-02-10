@@ -48,6 +48,14 @@ var Powerup = function (game) {
         }
         return 1;
     }
+
+    this.pack = function () {
+        return {
+            "type": this.type,
+            "pos": this.pos,
+            "content": this.content
+        }
+    }
     game.addActor(this);
 }
 
