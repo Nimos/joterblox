@@ -595,8 +595,8 @@ var drawHUD = function (ctx, hud) {
     }
 
     // remaining Time until next round
-    if (hud.timeRemaining) {
-        var t = hud.timeRemaining;
+    if (state.timeRemaining) {
+        var t = state.timeRemaining;
         var mins = Math.floor(t/60000);
         t %= 60000;
         var s = Math.floor(t/1000);
@@ -771,7 +771,7 @@ var drawEndscreen = function (ctx) {
 
     // Timer
     ctx.font = "24px PressStart2P"
-    var s = Math.floor(hud.timeRemaining/1000);
+    var s = Math.floor(state.timeRemaining/1000);
     ctx.textAlign = "right";
     ctx.fillText("Next map in "+s+"...", cornerX+roundOverWidth-30, cornerY+roundOverHeight-10);
     
