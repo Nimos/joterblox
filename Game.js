@@ -86,11 +86,6 @@ var Game = function () {
         // Measuring tick time to track performance issues
         var stopwatch = (new Date()).getTime()
 
-        
-        // Reset our sound and message queue
-        this.sounds = [];
-        this.messages = [];
-            
         if (this.state == 1) {
             // Iterate over actors to do actor things
             for (var i=0; i<actors.length; i++) {
@@ -144,6 +139,10 @@ var Game = function () {
         // Wrap up all the important things in an object and send it to clients
         var gameState = {"map": this.map, "actors": actors, "sounds": this.sounds, "messages": this.messages, "users": connections, "state": this.state}
         io.emit('update', gameState);
+        
+        // Reset our sound and message queue
+        this.sounds = [];
+        this.messages = [];
 
         // Measure the time we took to process this tick and warn if it's higher than my arbitrary chosen threshold
         var tickTime = (new Date()).getTime()-stopwatch

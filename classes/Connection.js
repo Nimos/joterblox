@@ -40,7 +40,7 @@ var Connection = function (game, socket) {
         pingticks %= settings.playerConnection.pingInterval;
         if (pingticks++ == 0) {
             if (pingWaiting) {
-                game.messages.push(name +" timed out.");
+                game.messages.push(settings.strings.playerTimeout.replace("{name}", this.name));
                 socket.disconnect();
                 if (player) {
                     player.active = false;
@@ -100,6 +100,12 @@ var Connection = function (game, socket) {
         player = new Player(game, self, name, color)
         player.active = true;
         respawnFrames = 0;
+        
+
+        if (!self.joined) {
+            game.messages.push(settings.strings.playerJoin.replace("{name}", name));
+            game.sounds.push("join");
+        }
         self.joined = true;
     }
 
@@ -128,7 +134,8 @@ var Connection = function (game, socket) {
 
     socket.on('disconnect', function (key) {
         connected = false;
-        game.messages.push(name +" has left the game.");
+        game.messages.push(settings.strings.playerQuit.replace("{name}", this.name));
+        game.sounds.push("leave");
         if (player) {
             player.active = false;
             player.remove = true;

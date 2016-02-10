@@ -78,7 +78,10 @@ var settings = {
             "All hope is lost, bow down to {name}" //13
         ],
         "multiKillNumbers": [null, "DOUBLE", "TRIPLE", "QUADRA", "PENTA", "HEXA", "HEPTA", "OCTA", "NONA", "DECA"],
-        "multiKill": "{name} SCORED A {number} KILL!"
+        "multiKill": "{name} SCORED A {number} KILL!",
+        "playerJoin": "{name} has joined the game.",
+        "playerTimeout": "{name}'s connection timed out.",
+        "playerQuit": "{name} has left the game.",
     }
 }
 

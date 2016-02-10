@@ -53,6 +53,8 @@ var sounds = {
     "flame": new Audio("/assets/sounds/flame.wav"),
     "death": new Audio("/assets/sounds/death.wav"),
     "shotgun": new Audio("/assets/sounds/shotgun.wav"),
+    "join": new Audio("/assets/sounds/join.wav"),
+    "leave": new Audio("/assets/sounds/leave.wav")
 };
 
 // Sprites we want to preload
