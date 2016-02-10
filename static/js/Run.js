@@ -27,7 +27,7 @@ var messagelog = [];
 
 // Messages and sounds that are about to be displayed
 var messageQueue = [];
-var soundQUeue = [];
+var soundQueue = [];
 
 // Are we holding tab right now?
 var showScores = false;
@@ -749,7 +749,7 @@ var handleUpdate = function (s) {
 
     // Add messages from message queue to our message log
     var q = state.messages.concat(messageQueue);
-    for (var i = 0; i < stateq.length; i++) {
+    for (var i = 0; i < q.length; i++) {
         console.log(q[i]); // Always good to have messages in the console.
         messagelog.push(q[i]);
         setTimeout("messagelog.shift()", 10000); // Remove new message entry after 10 seconds
@@ -782,8 +782,8 @@ var handleUpdate = function (s) {
 // Listener for the hud update event, just updates the global hud variable
 var updateHud = function (data) {
     hud = data;
-    messageQueue.push(data.messages);
-    soundQueue.push(data.sounds);
+    messageQueue = messageQueue.concat(data.messages);
+    soundQueue = soundQueue.concat(data.sounds);
 }
 
 var connect = function () {

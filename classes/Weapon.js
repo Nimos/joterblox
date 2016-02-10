@@ -217,7 +217,11 @@ var Weapon = function (game, name, owner) {
             new Projectile(game, pos, target, this, player);
             this.ammo--;
             this.cooldown = this.fireRate;
+            return true;
+        } else if (this.ammo == 0) {
+            return false;
         }
+        return true;
     }
 
     // Called every tick to recharge ammo

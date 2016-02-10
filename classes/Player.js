@@ -42,6 +42,8 @@ var Player = function (game, connection, name, color) {
     var lasthitby =  null;
     this.lasthitby = {"name": "", "weapon": ""};
 
+    var holdingClick = false;
+
 
     this.setLastHitBy = function (player, weapon) {
         this.lasthitby = {"name": player.name, "weapon": weapon};
@@ -99,7 +101,11 @@ var Player = function (game, connection, name, color) {
 
         // Shoot
         if (keys.space) {
-            this.weapon.shoot(this, this.pos, cursor)
+            var success = this.weapon.shoot(this, this.pos, cursor)
+            if (!success && !holdingClick) connection.sounds.push("cd");
+            holdingClick = true;
+        } else {
+            holdingClick = false;
         }
         // process ammo reload
         this.weapon.updateAmmo(keys.space)
