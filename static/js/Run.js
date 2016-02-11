@@ -783,27 +783,33 @@ var drawScoreboard = function (ctx, state) {
 
     for (var i = 0; i < scoreboard.length; i++) {
         s = scoreboard[i];
+        // Only display top 20 joined players
         if (s.joined && i-n+1 <= 20) {
             ctx.font = "15px PressStart2P";
-
             ctx.fillStyle = "black";
-            if (s.score >= 0) {
-                ctx.fillText(((i - n + 1) + ordinalString(i - n + 1)).makeLength(4, " ", "left") + " " + (s.score + "").makeLength(3, "0", "left") + " " + s.name.makeLength(24, "-"), 230 + 2, 125 + 2 + (i - n) * 20);
-                ctx.fillStyle = "white";
-                ctx.fillText(((i - n + 1) + ordinalString(i - n + 1)).makeLength(4, " ", "left") + " " + (s.score + "").makeLength(3, "0", "left") + " " + s.name.makeLength(24, "-"), 230, 125 + (i - n) * 20);
-            } else {
-                ctx.fillText(((i - n + 1) + ordinalString(i - n + 1)).makeLength(4, " ", "left") + " -" + (-s.score + "").makeLength(2, "0", "left") + " " + s.name.makeLength(24, "-"), 230 + 2, 125 + 2 + (i - n) * 20);
-                ctx.fillStyle = "white";
-                ctx.fillText(((i - n + 1) + ordinalString(i - n + 1)).makeLength(4, " ", "left") + " -" + (-s.score + "").makeLength(2, "0", "left") + " " + s.name.makeLength(24, "-"), 230, 125 + (i - n) * 20);
-            }
 
+            // 1st, 2nd, etc.
+            var rank = ((i - n + 1) + ordinalString(i - n + 1)).makeLength(4, " ", "left");
+            // ..., -01, 000, 001, ...
+            var score = s.score>=0 ? (s.score + "").makeLength(3, "0", "left") : "-"+((-s.score + "").makeLength(2, "0", "left"));
+            // PLAYERNAME--------------- (filled up with - to max length)
+            var name = s.name.makeLength(settings.playerConnection.maxNameLength, "-");
+
+            // Shadow
+            ctx.fillText(rank + " " + score + " " + name, 230 + 2, 125 + 2 + (i - n) * 20);
+            // Red if self
+            ctx.fillStyle = hud.self == s.uID ? "red" : "white";
+            // Text
+            ctx.fillText(rank + " " + score + " " + name, 230, 125 + (i - n) * 20);
+
+            // Latency display in Scoreboard (No text)
             var playerPing = new PingDisplay(ctx, 740, c.height-(123+(i-n)*20), s.ping, 3);
             playerPing.draw();
         } else {
             n++;
         }
     }
-}
+};
 
 var drawEndscreen = function (ctx) {
     var roundOverHeight = 480;
