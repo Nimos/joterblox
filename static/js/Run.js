@@ -805,7 +805,7 @@ var drawScoreboard = function (ctx, state) {
             // Shadow
             ctx.fillText(rank + " " + score + " " + name, 230 + 2, 125 + 2 + (i - n) * 20);
             // Red if self
-            ctx.fillStyle = hud.self == s.uID ? "red" : "white";
+            ctx.fillStyle = hud.self == s.uID ? settings.client.scoreBoardSelfColor : settings.client.scoreBoardTextColor;
             // Text
             ctx.fillText(rank + " " + score + " " + name, 230, 125 + (i - n) * 20);
 
