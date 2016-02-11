@@ -44,9 +44,6 @@ var selectedInput = null;
 // All inputs on this screen
 var allInputs = [];
 
-// Input of chat if active
-var chatInput = null;
-
 // Keep track of stuff.
 var connecting = false;
 var sock;
@@ -286,8 +283,6 @@ var CanvasInput = function (ctx, name, x, y, width) {
     this.borderColor = null;        // color of the border (null = no border)
     this.borderWidth = 1;           // Border thickness in px
 
-    this.active = true;             // Stop interacting with this input if this value is true
-
 
     // Check if user clicked on an input field
     c.onclick = function(e) {
@@ -295,8 +290,6 @@ var CanvasInput = function (ctx, name, x, y, width) {
         // Cursor x has to be between minX and maxX of box
         // AND    y has to be between minY and maxY of box
         for (var i=0; i<allInputs.length; i++) {
-            if (!allInputs[i].active) return;
-
             var minX;
 
             if (allInputs[i].align == "center") {
@@ -318,8 +311,6 @@ var CanvasInput = function (ctx, name, x, y, width) {
 
     // Draw this input to the canvas
     this.draw = function() {
-        if (!this.active) return; // don't draw inactive inputs
-        
         // corrected x coordinate needed for center align
         var myX;
 
@@ -421,6 +412,13 @@ var PingDisplay = function(ctx, x, y, ping, size, showText) {
 
     // Call this to draw me
     this.draw = function() {
+        // Bar shadows
+        ctx.fillStyle = "black";
+        ctx.fillRect(this.x + 0 * this.size * 1.5 + 2, c.height - this.y - this.size - this.size * 0 + 2, this.size * 0.9, 1 * this.size);
+        ctx.fillRect(this.x + 1 * this.size * 1.5 + 2, c.height - this.y - this.size - this.size * 1 + 2, this.size * 0.9, 2 * this.size);
+        ctx.fillRect(this.x + 2 * this.size * 1.5 + 2, c.height - this.y - this.size - this.size * 2 + 2, this.size * 0.9, 3 * this.size);
+        ctx.fillRect(this.x + 3 * this.size * 1.5 + 2, c.height - this.y - this.size - this.size * 3 + 2, this.size * 0.9, 4 * this.size);
+
         // Set the color based on the range the ping is in
         if (ping < settings.pingDisplay.ranges[2]) {
             this.color = settings.pingDisplay.colors[3];
@@ -432,41 +430,41 @@ var PingDisplay = function(ctx, x, y, ping, size, showText) {
             this.color = settings.pingDisplay.colors[0];
         }
 
-        // Prepare font, stroke and fill properties
-        ctx.font = 4 * this.size + "px PressStart2P";
-        ctx.lineWidth = this.lineWidth;
-        ctx.strokeStyle = "black";
+        // Setup font
         ctx.fillStyle = this.color;
 
-        // Outlines
-        ctx.strokeRect(this.x + 0 * this.size * 1.5, c.height - this.y - this.size - this.size * 0, this.size * 0.9, 1 * this.size);
-        ctx.strokeRect(this.x + 1 * this.size * 1.5, c.height - this.y - this.size - this.size * 1, this.size * 0.9, 2 * this.size);
-        ctx.strokeRect(this.x + 2 * this.size * 1.5, c.height - this.y - this.size - this.size * 2, this.size * 0.9, 3 * this.size);
-        ctx.strokeRect(this.x + 3 * this.size * 1.5, c.height - this.y - this.size - this.size * 3, this.size * 0.9, 4 * this.size);
+        // We always fill the first bar
+        ctx.fillRect(this.x + 0 * this.size * 1.5, c.height - this.y - this.size - this.size * 0, this.size * 0.9, 1 * this.size);
 
-        // Always fill first bar (Even if ping is 35836983590 years)
-            ctx.fillRect(this.x + 0 * this.size * 1.5, c.height - this.y - this.size - this.size * 0, this.size * 0.9, 1 * this.size);
-
-        // Fill second bar if ping is lower than worst
-        if (ping < settings.pingDisplay.ranges[0]) { //
-            ctx.fillRect(this.x + 1 * this.size * 1.5, c.height - this.y - this.size - this.size * 1, this.size * 0.9, 2 * this.size);
+        /* Second bar */
+        if (ping > settings.pingDisplay.ranges[0]) {
+            ctx.fillStyle = "grey"; // This stops the bars drawing in color and makes them grey instead
         }
+        ctx.fillRect(this.x + 1 * this.size * 1.5, c.height - this.y - this.size - this.size * 1, this.size * 0.9, 2 * this.size);
 
-        // Fill third bar if ping is okay but not perfect
-        if (ping < settings.pingDisplay.ranges[1]) {
-            ctx.fillRect(this.x + 2 * this.size * 1.5, c.height - this.y - this.size - this.size * 2, this.size * 0.9, 3 * this.size);
+        /* Third bar */
+        if (ping > settings.pingDisplay.ranges[1]) {
+            ctx.fillStyle = "grey";
         }
+        ctx.fillRect(this.x + 2 * this.size * 1.5, c.height - this.y - this.size - this.size * 2, this.size * 0.9, 3 * this.size);
 
-        // Fill fourth bar if ping is really good
-        if (ping < settings.pingDisplay.ranges[2]) {
-            ctx.fillRect(this.x + 3 * this.size * 1.5, c.height - this.y - this.size - this.size * 3, this.size * 0.9, 4 * this.size);
+        /* Last Bar */
+        if (ping > settings.pingDisplay.ranges[2]) {
+            ctx.fillStyle = "grey";
         }
+        ctx.fillRect(this.x + 3 * this.size * 1.5, c.height - this.y - this.size - this.size * 3, this.size * 0.9, 4 * this.size);
 
         // Write ping in ms right to the bars
         if (this.showText) {
+            // Setup font
+            ctx.font = 4 * this.size + "px PressStart2P";
             ctx.textAlign = "left";
-            ctx.strokeStyle = "black";
-            ctx.strokeText(ping, this.x + 5 * this.size * 1.5, c.height - this.y);
+
+            // Shadow
+            ctx.fillStyle = "black";
+            ctx.fillText(ping, this.x + 5 * this.size * 1.5 + 2, c.height - this.y + 2);
+
+            // Text
             ctx.fillStyle = this.color;
             ctx.fillText(ping, this.x + 5 * this.size * 1.5, c.height - this.y);
         }
@@ -686,17 +684,13 @@ var drawHUD = function (ctx, hud) {
 
     // Green triangle over player when holding donw the alt key
     if (showLocationFinder) {
-        try {
-            ctx.font = "15px sans-serif";
-            ctx.textAlign = "center";
-            ctx.fillStyle = "rgb(" + hud.playerColor[0] + "," + hud.playerColor[1] + "," + hud.playerColor[2] + ")";
-            hud.playerY = map.size[1] - hud.playerY; // 80%
-            ctx.fillText("▼", hud.playerX, hud.playerY - 30);
-            ctx.strokeStyle = "black";
-            ctx.strokeText("▼", hud.playerX, hud.playerY - 30);
-        } catch(err) {
-            // A dead player does not have a color
-        }
+        ctx.font = "15px sans-serif";
+        ctx.textAlign = "center";
+        hud.playerY = map.size[1] - hud.playerY; // 80%
+        ctx.fillStyle = "black";
+        ctx.fillText("▼", hud.playerX + 2, hud.playerY - 30 + 2);
+        ctx.fillStyle = "#f0f";
+        ctx.fillText("▼", hud.playerX, hud.playerY - 30);
     }
 
     // remaining Time until next round
@@ -712,11 +706,6 @@ var drawHUD = function (ctx, hud) {
         ctx.font = "16px PressStart2P";
         ctx.textAlign = "left"
         ctx.fillText("Time: "+mins+":"+s, c.width/2 + hudBarWidth/2 +2, c.height-(hudBarHeight+1))
-    }
-
-    // Input bar for the chat
-    if (chatInput && chatActive) {
-        chatInput.draw();
     }
 }
 
@@ -801,19 +790,10 @@ var drawScoreboard = function (ctx, state) {
 
     for (var i = 0; i < scoreboard.length; i++) {
         s = scoreboard[i];
+        // Only display top 20 joined players
         if (s.joined && i-n+1 <= 20) {
             ctx.font = "15px PressStart2P";
-
             ctx.fillStyle = "black";
-            if (s.score >= 0) {
-                ctx.fillText(((i - n + 1) + ordinalString(i - n + 1)).makeLength(4, " ", "left") + " " + (s.score + "").makeLength(3, "0", "left") + " " + s.name.makeLength(24, "-"), 230 + 2, 125 + 2 + (i - n) * 20);
-                ctx.fillStyle = "white";
-                ctx.fillText(((i - n + 1) + ordinalString(i - n + 1)).makeLength(4, " ", "left") + " " + (s.score + "").makeLength(3, "0", "left") + " " + s.name.makeLength(24, "-"), 230, 125 + (i - n) * 20);
-            } else {
-                ctx.fillText(((i - n + 1) + ordinalString(i - n + 1)).makeLength(4, " ", "left") + " -" + (-s.score + "").makeLength(2, "0", "left") + " " + s.name.makeLength(24, "-"), 230 + 2, 125 + 2 + (i - n) * 20);
-                ctx.fillStyle = "white";
-                ctx.fillText(((i - n + 1) + ordinalString(i - n + 1)).makeLength(4, " ", "left") + " -" + (-s.score + "").makeLength(2, "0", "left") + " " + s.name.makeLength(24, "-"), 230, 125 + (i - n) * 20);
-            }
 
             // 1st, 2nd, etc.
             var rank = ((i - n + 1) + ordinalString(i - n + 1)).makeLength(4, " ", "left");
@@ -826,6 +806,7 @@ var drawScoreboard = function (ctx, state) {
             ctx.fillText(rank + " " + score + " " + name, 230 + 2, 125 + 2 + (i - n) * 20);
             // Red if self
             ctx.fillStyle = hud.self == s.uID ? settings.client.scoreBoardSelfColor : settings.client.scoreBoardTextColor;
+
             // Text
             ctx.fillText(rank + " " + score + " " + name, 230, 125 + (i - n) * 20);
 
@@ -836,7 +817,7 @@ var drawScoreboard = function (ctx, state) {
             n++;
         }
     }
-}
+};
 
 var drawEndscreen = function (ctx) {
     var roundOverHeight = 480;
@@ -960,23 +941,6 @@ var handleUpdate = function (s) {
     drawCursor();
 }
 
-var chatActive = false;
-var showChat = function () {
-    if (chatActive) return;
-    chatActive = true;
-    chatInput = allInputs[allInputs.push(new CanvasInput(ctx, "chat", 20, c.height-60,  c.width/2))-1];
-    chatInput.maxLength = 140;
-    chatInput.align = "left";
-    chatInput.fontFace = "PressStart2P";
-    chatInput.fontSize = 16;
-    chatInput.padding = 10;
-    chatInput.color = "black";
-    chatInput.borderWidth = 1;
-    chatInput.borderColor = "black";
-    selectedInput = chatInput;
-    chatInput.active = true;
-}
-
 var loadMap = function (e) {
     map = e;
 }
@@ -1064,16 +1028,7 @@ document.onkeydown = function (e) {
             // Do this action only if the selected input is the setName input
             if (selectedInput.name == "setName") {
                 sock.emit("setName", selectedInput.submit());
-            } else if (selectedInput.name =="chat") {
-                sock.emit("chat", selectedInput.submit());
-                chatActive = false;
-                chatInput.active = false;
             }
-        }
-    } else {
-        // Open the chat screen on enter/t
-        if (e.keyCode == "84" || e.keyCode == "13") {
-            if (hud.screen != 2) showChat();
         }
     }
 
