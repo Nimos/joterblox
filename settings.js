@@ -52,6 +52,9 @@ var settings = {
         "mainMenuHeight": 720,
         "mainMenuWidth": 1280,
 
+        // Scoreboard
+        "scoreBoardSelfColor": "cyan", // color of self in scoreboard
+        "scoreBoardTextColor": "white" // color of all others in scoreboard
     },
 
     "pingDisplay": {
