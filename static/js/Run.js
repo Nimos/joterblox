@@ -44,6 +44,9 @@ var selectedInput = null;
 // All inputs on this screen
 var allInputs = [];
 
+// Input of chat if active
+var chatInput = null;
+
 // Keep track of stuff.
 var connecting = false;
 var sock;
@@ -283,6 +286,7 @@ var CanvasInput = function (ctx, name, x, y, width) {
     this.borderColor = null;        // color of the border (null = no border)
     this.borderWidth = 1;           // Border thickness in px
 
+    this.active = true;             // Stop interacting with this input if this value is true
 
     // Check if user clicked on an input field
     c.onclick = function(e) {
@@ -290,6 +294,8 @@ var CanvasInput = function (ctx, name, x, y, width) {
         // Cursor x has to be between minX and maxX of box
         // AND    y has to be between minY and maxY of box
         for (var i=0; i<allInputs.length; i++) {
+            if (!allInputs[i].active) return; // don't interact with inactive inputs
+
             var minX;
 
             if (allInputs[i].align == "center") {
@@ -311,6 +317,8 @@ var CanvasInput = function (ctx, name, x, y, width) {
 
     // Draw this input to the canvas
     this.draw = function() {
+        if (!this.active) return; // don't draw inactive inputs
+
         // corrected x coordinate needed for center align
         var myX;
 
@@ -707,6 +715,11 @@ var drawHUD = function (ctx, hud) {
         ctx.textAlign = "left"
         ctx.fillText("Time: "+mins+":"+s, c.width/2 + hudBarWidth/2 +2, c.height-(hudBarHeight+1))
     }
+
+    // Input for the chat
+    if (chatInput && chatActive) {
+        chatInput.draw();
+    }
 }
 
 var drawDeathScreen = function (ctx, hud) {
@@ -890,6 +903,24 @@ var drawEndscreen = function (ctx) {
 
 }
 
+var chatActive = false;
+// Show chat input and make it active
+var showChat = function () {
+    if (chatActive) return;
+    chatActive = true;
+    chatInput = allInputs[allInputs.push(new CanvasInput(ctx, "chat", 20, c.height-60,  c.width/2))-1];
+    chatInput.maxLength = 140;
+    chatInput.align = "left";
+    chatInput.fontFace = "PressStart2P";
+    chatInput.fontSize = 16;
+    chatInput.padding = 10;
+    chatInput.color = "black";
+    chatInput.borderWidth = 1;
+    chatInput.borderColor = "black";
+    selectedInput = chatInput;
+    chatInput.active = true;
+}
+
 // Listener for update socket events
 // Redraws the game based on the last update, plays sounds and displays messages
 var handleUpdate = function (s) {
@@ -1028,7 +1059,16 @@ document.onkeydown = function (e) {
             // Do this action only if the selected input is the setName input
             if (selectedInput.name == "setName") {
                 sock.emit("setName", selectedInput.submit());
+            } else if (selectedInput.name =="chat") {
+                sock.emit("chat", selectedInput.submit());
+                chatActive = false;
+                chatInput.active = false;
             }
+        }
+    } else {
+        // Open the chat screen on enter/t
+        if (e.keyCode == "84" || e.keyCode == "13") {
+            if (hud.screen != 2) showChat();
         }
     }
 

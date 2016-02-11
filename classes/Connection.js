@@ -212,6 +212,15 @@ var Connection = function (game, socket) {
         self.cursor = cords;
     });
 
+    socket.on('chat', function (message) {
+        if (message.substr(0,1) == "/") {
+            // commands
+        } else if (message.trim() != "") {
+            game.messages.push("<"+self.name+"> "+message.substr(0,140))
+            game.sounds.push("leave")
+        }
+    });
+
     socket.emit("loadMap", game.map.pack())
 
     // Add this object to the connection array
