@@ -44,12 +44,15 @@ var selectedInput = null;
 // All inputs on this screen
 var allInputs = [];
 
-// Input of chat if active
+// Global pointers to inputs
 var chatInput = null;
+var nameinput;
 
 // Keep track of stuff.
 var connecting = false;
 var sock;
+
+var profile;
 
 // Load resources
 /*var sounds = {
@@ -506,7 +509,7 @@ var drawMenu = function () {
     if (allInputs.length == 0) {
         // Input field for entering the playername
         // [].push() returns the length of the array, length-1 is the position of the last pushed element
-        var nameinput = allInputs[allInputs.push(new CanvasInput(ctx, "setName", c.width/2, 590, 500))-1];
+        nameinput = allInputs[allInputs.push(new CanvasInput(ctx, "setName", c.width/2, 590, 500))-1];
         nameinput.maxLength = 20;
         nameinput.align = "center";
         nameinput.fontFace = "PressStart2P";
@@ -515,6 +518,8 @@ var drawMenu = function () {
         nameinput.color = "black";
         nameinput.borderWidth = 3;
         nameinput.borderColor = "black";
+
+        if (profile && profile.username) nameinput.text = profile.username;
 
         // Set nameinput as selected (Autofocus)
          selectedInput = nameinput;
@@ -977,10 +982,15 @@ var loadMap = function (e) {
 }
 
 var connect = function () {
+    var sessionID = localStorage.getItem("sessionID");
+    if (!sessionID) {
+        sessionID = Math.round( Math.random()*1000000 ) // Not the securest ever, I know
+        localStorage.setItem("sessionID", sessionID);
+    }
     connecting = false;
     if (sock) return; // Only connect once
     // Open the socket and add listeners
-    sock = io(window.location.hostname+":"+settings.gameServer.port);
+    sock = io(window.location.hostname+":"+settings.gameServer.port, {"query": "sessionID="+sessionID});
     sock.on("update", handleUpdate);
     sock.on("loadMap", loadMap);
 
@@ -994,6 +1004,12 @@ var connect = function () {
         sock.disconnect()
         sock = null;
         titleScreenInterval = setInterval(titleScreenRefresh, 33);
+    });
+
+    // Sync some settings from the serverside profile
+    sock.on("login", function (p) {
+        profile = p;
+        if (nameinput) nameinput.text = p.username;
     });
 }
 

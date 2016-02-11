@@ -333,8 +333,15 @@ var Game = function () {
     // Add the listeners for new connections
     io.on('connection', function(socket){
         console.log('[Info] New player');
-        new Connection(game, socket)
     });
+
+    // Session based authentication
+    io.use(function(socket, next) {
+        var sessionID = socket.request._query["sessionID"];
+        new Connection(game, socket, sessionID)
+        next();
+    });
+
 
     // Start the game loop
     setInterval(this.update.bind(this), 32);

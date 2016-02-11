@@ -1,10 +1,11 @@
 var Player = require("./Player")
+var Profile = require("./Profile")
 var adds = [];
 var settings = require("../settings");
 
 var curID=0;
 
-var Connection = function (game, socket) {
+var Connection = function (game, socket, sessionID) {
     // Track Controls
     this.keys = {
         "up": false,
@@ -42,6 +43,8 @@ var Connection = function (game, socket) {
     // unique ID
     this.uid = curID++;
 
+    // Profile
+    this.profile = null;
 
     // Things to do regularily
     this.update = function () {
@@ -159,6 +162,7 @@ var Connection = function (game, socket) {
         n = n.substring(0,settings.playerConnection.maxNameLength);
         name = n;
         self.name = n;
+        self.profile.username = n;
         spawnPlayer();
     });
 
@@ -190,6 +194,7 @@ var Connection = function (game, socket) {
                 adds.splice(i--, 1)
             }
         }
+        self.profile.save();
     });
 
     socket.on("pang", function (time) {
@@ -206,6 +211,7 @@ var Connection = function (game, socket) {
 
     socket.on('setColor', function (cs) {
         color = cs;
+        self.profile.color = cs;
     });
 
     socket.on('mousemove', function (cords) {
@@ -220,6 +226,21 @@ var Connection = function (game, socket) {
             game.sounds.push("leave")
         }
     });
+
+    if (sessionID) {
+        Profile.get({"currentSession": sessionID}, function (p) {
+            console.log(p);
+            if (p) {
+                self.profile = p;
+                color = p.color;
+                self.name = p.username;
+            } else {
+                self.profile = new Profile();
+                self.profile.currentSession = sessionID;
+            }
+            socket.emit("login", self.profile);
+        });
+    }
 
     socket.emit("loadMap", game.map.pack())
 

@@ -1,4 +1,7 @@
 var settings = {
+    "database": {
+        "url": "mongodb://localhost:27017/joterblox-dev"
+    },
     "player": {
         "maxHP": 100, // max health
         "speedCap": 10, // max speed to go left/right

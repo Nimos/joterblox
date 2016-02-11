@@ -4,6 +4,12 @@
   "description": "Joter Blox is a web based multiplayer game that lets you compete with your friends in a small battle arena",
   "dependencies": {
     "express": "^4.10.2",
+    "mongodb": "^2.1.7",
+    "monk": "^1.0.1",
     "socket.io": "^1.4.5"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Nimos/joterblox.git"
   }
 }
