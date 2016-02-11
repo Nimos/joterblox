@@ -677,17 +677,13 @@ var drawHUD = function (ctx, hud) {
 
     // Green triangle over player when holding donw the alt key
     if (showLocationFinder) {
-        try {
-            ctx.font = "15px sans-serif";
-            ctx.textAlign = "center";
-            ctx.fillStyle = "rgb(" + hud.playerColor[0] + "," + hud.playerColor[1] + "," + hud.playerColor[2] + ")";
-            hud.playerY = map.size[1] - hud.playerY; // 80%
-            ctx.fillText("▼", hud.playerX, hud.playerY - 30);
-            ctx.strokeStyle = "black";
-            ctx.strokeText("▼", hud.playerX, hud.playerY - 30);
-        } catch(err) {
-            throw err;
-        }
+        ctx.font = "15px sans-serif";
+        ctx.textAlign = "center";
+        hud.playerY = map.size[1] - hud.playerY; // 80%
+        ctx.fillStyle = "black";
+        ctx.fillText("▼", hud.playerX + 2, hud.playerY - 30 + 2);
+        ctx.fillStyle = "#f0f";
+        ctx.fillText("▼", hud.playerX, hud.playerY - 30);
     }
 
     // remaining Time until next round
