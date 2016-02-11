@@ -178,7 +178,7 @@ var Connection = function (game, socket) {
     socket.on('disconnect', function (key) {
         connected = false;
         if (self.joined) {
-            game.messages.push(settings.strings.playerQuit.replace("{name}", this.name));
+            game.messages.push(settings.strings.playerQuit.replace("{name}", self.name));
             game.sounds.push("leave");
         }
         if (player) {
