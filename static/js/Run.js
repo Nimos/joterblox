@@ -686,7 +686,7 @@ var drawHUD = function (ctx, hud) {
             ctx.strokeStyle = "black";
             ctx.strokeText("▼", hud.playerX, hud.playerY - 30);
         } catch(err) {
-            // A dead player does not have a color
+            throw err;
         }
     }
 
