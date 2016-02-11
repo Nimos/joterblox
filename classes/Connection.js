@@ -86,6 +86,9 @@ var Connection = function (game, socket) {
                 "maxAmmo": player.weapon.maxAmmo, 
                 "ammoTicks": player.weapon.ammoTicks
             };
+            hud["playerX"] = player.pos[0];
+            hud["playerY"] = player.pos[1];
+            hud["playerColor"] = player.color;
         } else if (player && !player.active) { // User is dead, show respawn screen
             hud["screen"] = 1;
             hud["hp"] = 0;
