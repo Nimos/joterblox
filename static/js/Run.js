@@ -412,6 +412,13 @@ var PingDisplay = function(ctx, x, y, ping, size, showText) {
 
     // Call this to draw me
     this.draw = function() {
+        // Bar shadows
+        ctx.fillStyle = "black";
+        ctx.fillRect(this.x + 0 * this.size * 1.5 + 2, c.height - this.y - this.size - this.size * 0 + 2, this.size * 0.9, 1 * this.size);
+        ctx.fillRect(this.x + 1 * this.size * 1.5 + 2, c.height - this.y - this.size - this.size * 1 + 2, this.size * 0.9, 2 * this.size);
+        ctx.fillRect(this.x + 2 * this.size * 1.5 + 2, c.height - this.y - this.size - this.size * 2 + 2, this.size * 0.9, 3 * this.size);
+        ctx.fillRect(this.x + 3 * this.size * 1.5 + 2, c.height - this.y - this.size - this.size * 3 + 2, this.size * 0.9, 4 * this.size);
+
         // Set the color based on the range the ping is in
         if (ping < settings.pingDisplay.ranges[2]) {
             this.color = settings.pingDisplay.colors[3];
@@ -423,41 +430,41 @@ var PingDisplay = function(ctx, x, y, ping, size, showText) {
             this.color = settings.pingDisplay.colors[0];
         }
 
-        // Prepare font, stroke and fill properties
-        ctx.font = 4 * this.size + "px PressStart2P";
-        ctx.lineWidth = this.lineWidth;
-        ctx.strokeStyle = "black";
+        // Setup font
         ctx.fillStyle = this.color;
 
-        // Outlines
-        ctx.strokeRect(this.x + 0 * this.size * 1.5, c.height - this.y - this.size - this.size * 0, this.size * 0.9, 1 * this.size);
-        ctx.strokeRect(this.x + 1 * this.size * 1.5, c.height - this.y - this.size - this.size * 1, this.size * 0.9, 2 * this.size);
-        ctx.strokeRect(this.x + 2 * this.size * 1.5, c.height - this.y - this.size - this.size * 2, this.size * 0.9, 3 * this.size);
-        ctx.strokeRect(this.x + 3 * this.size * 1.5, c.height - this.y - this.size - this.size * 3, this.size * 0.9, 4 * this.size);
+        // We always fill the first bar
+        ctx.fillRect(this.x + 0 * this.size * 1.5, c.height - this.y - this.size - this.size * 0, this.size * 0.9, 1 * this.size);
 
-        // Always fill first bar (Even if ping is 35836983590 years)
-            ctx.fillRect(this.x + 0 * this.size * 1.5, c.height - this.y - this.size - this.size * 0, this.size * 0.9, 1 * this.size);
-
-        // Fill second bar if ping is lower than worst
-        if (ping < settings.pingDisplay.ranges[0]) { //
-            ctx.fillRect(this.x + 1 * this.size * 1.5, c.height - this.y - this.size - this.size * 1, this.size * 0.9, 2 * this.size);
+        /* Second bar */
+        if (ping > settings.pingDisplay.ranges[0]) {
+            ctx.fillStyle = "grey"; // This stops the bars drawing in color and makes them grey instead
         }
+        ctx.fillRect(this.x + 1 * this.size * 1.5, c.height - this.y - this.size - this.size * 1, this.size * 0.9, 2 * this.size);
 
-        // Fill third bar if ping is okay but not perfect
-        if (ping < settings.pingDisplay.ranges[1]) {
-            ctx.fillRect(this.x + 2 * this.size * 1.5, c.height - this.y - this.size - this.size * 2, this.size * 0.9, 3 * this.size);
+        /* Third bar */
+        if (ping > settings.pingDisplay.ranges[1]) {
+            ctx.fillStyle = "grey";
         }
+        ctx.fillRect(this.x + 2 * this.size * 1.5, c.height - this.y - this.size - this.size * 2, this.size * 0.9, 3 * this.size);
 
-        // Fill fourth bar if ping is really good
-        if (ping < settings.pingDisplay.ranges[2]) {
-            ctx.fillRect(this.x + 3 * this.size * 1.5, c.height - this.y - this.size - this.size * 3, this.size * 0.9, 4 * this.size);
+        /* Last Bar */
+        if (ping > settings.pingDisplay.ranges[2]) {
+            ctx.fillStyle = "grey";
         }
+        ctx.fillRect(this.x + 3 * this.size * 1.5, c.height - this.y - this.size - this.size * 3, this.size * 0.9, 4 * this.size);
 
         // Write ping in ms right to the bars
         if (this.showText) {
+            // Setup font
+            ctx.font = 4 * this.size + "px PressStart2P";
             ctx.textAlign = "left";
-            ctx.strokeStyle = "black";
-            ctx.strokeText(ping, this.x + 5 * this.size * 1.5, c.height - this.y);
+
+            // Shadow
+            ctx.fillStyle = "black";
+            ctx.fillText(ping, this.x + 5 * this.size * 1.5 + 2, c.height - this.y + 2);
+
+            // Text
             ctx.fillStyle = this.color;
             ctx.fillText(ping, this.x + 5 * this.size * 1.5, c.height - this.y);
         }
