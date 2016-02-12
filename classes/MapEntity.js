@@ -16,7 +16,6 @@ var Jumper = function (game, pos, name) {
 
             if (a.pos[1]-settings.player.hitBoxSize/2 < myHitBox[3] && a.pos[1]+settings.player.hitBoxSize/2 > myHitBox[1] && a.pos[0]+settings.player.hitBoxSize/2 > myHitBox[0] && a.pos[0]-settings.player.hitBoxSize/2 < myHitBox[2]) {
                 a.speed[1] += settings.map.jumper.power;
-                console.log("col!!")
             }
         }
         return 1;
