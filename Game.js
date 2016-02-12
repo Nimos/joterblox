@@ -60,7 +60,7 @@ var Game = function () {
     this.powerups = 0;
     
     // Load the map
-    this.map = new Map();
+    this.map;
 
     // Sounds and messages for the clients to play/display on the next update
     this.sounds = [];
@@ -212,9 +212,9 @@ var Game = function () {
             map = maps[Math.floor(Math.random()*maps.length)]
         }
 
+        actors = [];
         this.map = new Map(this, map);
         io.emit("loadMap", this.map);
-        actors = [];
         this.actors = actors;
         powerupcounter = 0;
         

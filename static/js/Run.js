@@ -78,7 +78,8 @@ var gfxpreload = [
     "/assets/images/cover.jpg", 
     "/assets/images/entername.png", 
     "/assets/images/akirabg.png", 
-    "/assets/images/akirafg.png"
+    "/assets/images/akirafg.png",
+    ["/assets/images/jumper.png", 15, 20, 6, 1]
 ];
 
 var sfxpreload = [
@@ -152,7 +153,7 @@ var SpriteStorage = function (preload) {
     }
 
     // Get a Sprite from cache or create it
-    this.get = function (path, height, width, frames, speed) {
+    this.get = function (path, width,height, frames, speed) {
         if (sprites[path]) {
             return sprites[path];
         } else {
@@ -175,11 +176,13 @@ var SpriteStorage = function (preload) {
         if (typeof path != "object") {
             sprites[path] = new Sprite(path);
             this.currentlyLoading = path;
+            sprites[path].load = loadNext.bind(this);
         } else {
-            sprites[path] = new Sprite(path[0], path[1], path[2], path[3], path[4])
+            sprites[path[0]] = new Sprite(path[0], path[1], path[2], path[3], path[4])
             this.currentlyLoading = path[0];
+            sprites[path[0]].load = loadNext.bind(this);
         }
-        sprites[path].load = loadNext.bind(this);
+
     }
 
     if (preload) {
@@ -202,6 +205,7 @@ var Sprite = function (path, width, height, frames, speed) {
         animated = true;
         var startFrame = animFrames;
     }
+
 
     this.load = function () {console.log("HIHIHIHI")};
     this.onload = function () {
@@ -236,6 +240,7 @@ var Sprite = function (path, width, height, frames, speed) {
         if (animated) return image.height;
         return image.height
     }
+
 }
 
 var sprites = new SpriteStorage(gfxpreload);
@@ -625,6 +630,8 @@ var drawActors = function (ctx, state) {
                 ctx.fill();
             }
 
+        } else if (a.type == "jumper") {
+            sprites.draw(ctx, "/assets/images/jumper.png", a.pos[0]-7,  map.size[1] - (10+a.pos[1]));
         }
     } // end for
 } // end drawActors

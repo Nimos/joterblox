@@ -35,7 +35,11 @@ var settings = {
     },
 
     "map": {
-        "fallbackMap": "3lines" // which map to load as a fallback if the requested map can't be loaded
+        "fallbackMap": "3lines", // which map to load as a fallback if the requested map can't be loaded
+        "jumper": {
+            "hitbox": [15,20],
+            "power": 20
+        }
     },
 
     "powerup": {
