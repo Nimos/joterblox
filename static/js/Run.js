@@ -284,7 +284,7 @@ var CanvasInput = function (ctx, name, x, y, width) {
     this.color = "black";           // color of the text
     this.align = "center";          // alignment ("left" or "center")
 
-    this.padding;                   // padding in px
+    this.padding = 10;              // padding in px
     this.backgroundColor = null;    // color of the background (null = no background)
     this.borderColor = null;        // color of the border (null = no border)
     this.borderWidth = 1;           // Border thickness in px
