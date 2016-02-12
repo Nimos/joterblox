@@ -39,6 +39,8 @@ var Connection = function (game, socket, sessionID) {
 
     // Personal message / sound queues
     this.messages = [];
+    this.multiKillMessages = [];
+    this.killStreakMessages = [];
     this.sounds = [];
 
     // unique ID
@@ -76,6 +78,8 @@ var Connection = function (game, socket, sessionID) {
         var hud = {
             "ping": this.ping, 
             "messages": this.messages,
+            "multiKillMessages": this.multiKillMessages,
+            "killStreamMessages": this.killStreakMessages,
             "sounds": this.sounds,
             "self": this.uid
         }
@@ -103,11 +107,15 @@ var Connection = function (game, socket, sessionID) {
 
         packet["hud"] = hud;
         packet["messages"] = game.messages.concat(this.messages);
+        packet["multiKillMessages"] = game.multiKillMessages.concat(this.multiKillMessages);
+        packet["killStreakMessages"] = game.killStreakMessages.concat(this.killStreakMessages);
         packet["sounds"] = game.sounds.concat(this.sounds);
         socket.emit("update", packet);
 
         // Clear the queues
         this.messages = [];
+        this.multiKillMessages = [];
+        this.killStreakMessages = [];
         this.sounds = [];
     }
 

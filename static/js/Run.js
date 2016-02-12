@@ -24,6 +24,10 @@ var cursor = [0, 0];
 
 // Messages that are displayed
 var messagelog = [];
+var multiKillMessage = null;
+var multiKillMessageTimeout = null;
+var killStreakMessage = null;
+var killStreakMessageTimeout = null;
 
 // Messages and sounds that are about to be displayed
 var messageQueue = [];
@@ -510,7 +514,7 @@ var drawMenu = function () {
         // Input field for entering the playername
         // [].push() returns the length of the array, length-1 is the position of the last pushed element
         nameinput = allInputs[allInputs.push(new CanvasInput(ctx, "setName", c.width/2, 590, 500))-1];
-        nameinput.maxLength = 20;
+        nameinput.maxLength = settings.playerConnection.maxNameLength;
         nameinput.align = "center";
         nameinput.fontFace = "PressStart2P";
         nameinput.fontSize = 40;
@@ -633,6 +637,44 @@ var drawHUD = function (ctx, hud) {
         ctx.textAlign = "start";
         ctx.fillText(messagelog[i], 10, 15 + 15 * i);
     }
+
+    ctx.font = "16px PressStart2P";
+    ctx.textAlign = "center";
+    ctx.strokeStyle = "black";
+    ctx.lineWidth = 2;
+
+    var yPos = settings.client.prominentMessagesY;
+    var spacing = settings.client.prominentMessagesSpacing;
+
+    // Draw messages in multikill messagelog
+    if (multiKillMessage) {
+        // Border
+        ctx.strokeText(multiKillMessage, c.width / 2, yPos);
+
+        // Shadow
+        ctx.fillStyle = "black";
+        ctx.fillText(multiKillMessage, c.width / 2 + 2, yPos + 2);
+
+        // Text
+        ctx.fillStyle = settings.client.multiKillMessageColor;
+        ctx.fillText(multiKillMessage, c.width / 2, yPos);
+
+    }
+
+    if (killStreakMessage) {
+        // Border
+        ctx.strokeText(killStreakMessage, c.width/2, yPos + spacing);
+
+        // Shadow
+        ctx.fillStyle = "black";
+        ctx.fillText(killStreakMessage, c.width / 2 + 2, yPos + spacing + 2);
+
+        // Text
+        ctx.fillStyle = settings.client.killStreakMessageColor;
+        ctx.fillText(killStreakMessage, c.width / 2, yPos + spacing);
+    }
+
+
 
     // Draw bottom bar
     ctx.fillStyle = "#444";
@@ -985,6 +1027,24 @@ var handleUpdate = function (s) {
         console.log(q[i]); // Always good to have messages in the console.
         messagelog.push(q[i]);
         setTimeout("messagelog.shift()", 10000); // Remove new message entry after 10 seconds
+    }
+
+    var q = s.multiKillMessages;
+    for (var i = 0; i < q.length; i++) {
+        console.log("Multikill: "+q[i]);
+        multiKillMessage = q[i];
+        if (multiKillMessageTimeout) clearTimeout(multiKillMessageTimeout);
+        multiKillMessageTimeout = setTimeout(function() {
+            multiKillMessage = null;
+        }, settings.client.multiKillMessageDisplayTime); // Remove message entry after time is over
+    }
+
+    var q = s.killStreakMessages;
+    for (var i = 0; i < q.length; i++) {
+        console.log("Killstreak: "+q[i]);
+        killStreakMessage = q[i];
+        if(killStreakMessageTimeout) clearTimeout(killStreakMessageTimeout);
+        killStreakMessageTimeout = setTimeout("killStreakMessage = null", settings.client.killStreakMessageDisplayTime); // Remove message entry after time is over
     }
 
     // And the many things that are about drawing...

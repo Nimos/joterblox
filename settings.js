@@ -67,7 +67,15 @@ var settings = {
         "scoreBoardTextColor": "white", // color of all others in scoreboard
         "scoreBoardHeight": 416, // height of the scoreboard
         "scoreBoardWidth": 600, // height of the scoreboard
-        "scoreBoardMaxPlayers": 20 // doesnt really support any more
+        "scoreBoardMaxPlayers": 20, // doesnt really support any more
+
+        // Prominent message display
+        "killStreakMessageColor": "#B80000",
+        "multiKillMessageColor": "white",
+        "killStreakMessageDisplayTime": 7500, // in ms
+        "multiKillMessageDisplayTime": 5000, // in ms
+        "prominentMessagesY": 100, // y-pos of those two messages
+        "prominentMessagesSpacing": 40, // spacing of the lines
     },
 
     "pingDisplay": {

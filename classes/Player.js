@@ -66,13 +66,15 @@ var Player = function (game, connection, name, color) {
         var message = settings.strings.multiKill;
 
         // Post multikill message
-        if (multiKillCount > 1) game.messages.push(message.replace("{name}", this.name).replace("{number}", numberWords[multiKillCount-1]));
+        if (multiKillCount > 1) {
+            game.multiKillMessages.push(message.replace("{name}", this.name).replace("{number}", numberWords[multiKillCount-1]))
+        }
 
         // post Killstreak message
         if (killStreak > 1) {
             var message = (killStreak <= settings.strings.killStreak.length) ? settings.strings.killStreak[killStreak+1] : settings.strings.killStreak[settings.strings.killStreak.length-1];
             if (message) {
-                game.messages.push(message.replace("{name}", this.name));
+                game.killStreakMessages.push(message.replace("{name}", this.name));
             }
         }
 

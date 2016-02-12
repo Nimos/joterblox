@@ -65,6 +65,8 @@ var Game = function () {
     // Sounds and messages for the clients to play/display on the next update
     this.sounds = [];
     this.messages = [];
+    this.multiKillMessages = [];
+    this.killStreakMessages = [];
 
     // 1: RUNNING, 0: WAITING, 2: Between maps
     this.state = 0;
@@ -169,6 +171,8 @@ var Game = function () {
         // Reset our sound and message queue
         this.sounds = [];
         this.messages = [];
+        this.multiKillMessages = [];
+        this.killStreakMessages = [];
 
         // Measure the time we took to process this tick and warn if it's higher than my arbitrary chosen threshold
         var tickTime = (new Date()).getTime()-stopwatch
@@ -216,6 +220,8 @@ var Game = function () {
         
         this.sounds = [];
         this.messages = [];
+        this.multiKillMessages = [];
+        this.killStreakMessages = [];
         this.powerups = 0;
         for (var i=0;i<connections.length;i++) {
             c = connections[i];
