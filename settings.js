@@ -64,7 +64,10 @@ var settings = {
 
         // Scoreboard
         "scoreBoardSelfColor": "cyan", // color of self in scoreboard
-        "scoreBoardTextColor": "white" // color of all others in scoreboard
+        "scoreBoardTextColor": "white", // color of all others in scoreboard
+        "scoreBoardHeight": 416, // height of the scoreboard
+        "scoreBoardWidth": 600, // height of the scoreboard
+        "scoreBoardMaxPlayers": 20 // doesnt really support any more
     },
 
     "pingDisplay": {
