@@ -37,6 +37,9 @@ var Weapon = function (game, name, owner) {
             if (target) {
                 target.hp -= 5;
                 if (target !== owner) target.setLastHitBy( owner, "Flamethrower");
+
+                // Add to the hitcounter
+                owner.profile.statistics.flameHits+=1;
             }
             return 1;
         };
@@ -67,6 +70,7 @@ var Weapon = function (game, name, owner) {
             game.sounds.push("explosion");
             
             // Check who is in range of explosion and apply damage
+            var hit = false;
             for (var i=0; i<game.actors.length; i++) {
                 var a = game.actors[i];
                 if (a.type != "player") continue;
@@ -74,6 +78,7 @@ var Weapon = function (game, name, owner) {
                 var dist = Math.sqrt(Math.pow(projectile.pos[0]-a.pos[0], 2)+Math.pow(projectile.pos[1]-a.pos[1], 2))
                 if (dist < 5+60) {
                     if (a.type == "player") {
+                        hit = true;
                         a.hp -= 50;
                         a.speed[0] += vec[0]/(dist/40);
                         a.speed[1] += vec[1]/(dist/20); 
@@ -81,6 +86,10 @@ var Weapon = function (game, name, owner) {
                     }
                 }
             }
+
+            // Add to the hit statistics
+            if (hit) owner.profile.statistics.grenadeHits += 1;
+
             return 0;
         };
 
@@ -107,6 +116,7 @@ var Weapon = function (game, name, owner) {
 
             // and walk a line until we first hit a wall, checking if anyone is in our path...
             col = game.map.checkCollision(pos, 2)
+            var hit = false;
             while (!col[0] && !col[1]) {
                 pos[0] += direction[0];
                 pos[1] += direction[1];
@@ -119,12 +129,15 @@ var Weapon = function (game, name, owner) {
                             //...and damage them if they are
                             a.hp-=20;
                             a.setLastHitBy(owner, "Laser");
+                            hit = true;
                         }
                     }
                 }
                 if (game.map.checkBounds(pos, 2)) break;
                 col = game.map.checkCollision(pos, 2)
             }
+            // Add to the hitcounter
+            if (hit) owner.profile.statistics.laserHits+=1;
 
             // draw the effect from where we shot from to where the laser stopped
             new Effect(game, "laser", 10, [p[0],p[1]], pos)
@@ -156,6 +169,8 @@ var Weapon = function (game, name, owner) {
             if (target) {
                 target.hp -= 50;
                 if (owner !== target) target.setLastHitBy (owner, "Shotgun");
+                // Add to hitcoun stsatistic
+                owner.profile.statistics.shotgunHits+=1;
             }
             return 0;
         };
@@ -177,6 +192,8 @@ var Weapon = function (game, name, owner) {
             new Projectile(game, pos, target, this, player);
             target = [pos[0]+v2[0], pos[1]+v2[1]];
             new Projectile(game, pos, target, this, player);
+            // Add additional projectiles to statistics
+            owner.profile.statistics.shotgunShots +=2;
         }
     } else {// Default gun
         this.bulletSpeed = 20;
@@ -198,6 +215,8 @@ var Weapon = function (game, name, owner) {
             if (target) {
                 target.hp -= 20;
                 if (target !== owner) target.setLastHitBy(owner,"Gun");
+                
+                owner.profile.statistics.gunHits+=1;
             }
         }
 
@@ -210,6 +229,26 @@ var Weapon = function (game, name, owner) {
     // Called by player object to shoot
     this.shoot = function (player, pos, target) {
         if (this.ammo > 0 && this.cooldown <= 0) {
+            // Update shot statistics
+            switch (name) {
+                case "flamethrower":
+                    owner.profile.statistics.flameShots += 1;
+                    break;
+                case "laser":
+                    owner.profile.statistics.laserShots += 1;
+                    break;
+                case "shotgun":
+                    owner.profile.statistics.shotgunShots += 1;
+                    break;
+                case "grenades":
+                    owner.profile.statistics.grenadeShots += 1;
+                    break;
+                default:
+                    owner.profile.statistics.gunShots += 1;
+                    break;
+            }
+
+
             if (this.onShot) {
                 this.onShot(player, pos, target);
             }

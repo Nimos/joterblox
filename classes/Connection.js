@@ -24,6 +24,7 @@ var Connection = function (game, socket, sessionID) {
     var pingWaiting = false;
     var pingticks = 0;
     this.ping = 0;
+    var connectedSince = (new Date()).getTime()
 
     // Player customization
     var name = null;
@@ -194,6 +195,9 @@ var Connection = function (game, socket, sessionID) {
                 adds.splice(i--, 1)
             }
         }
+
+        self.profile.statistics.timePlayed += (new Date()).getTime() - connectedSince;
+
         self.profile.save();
     });
 

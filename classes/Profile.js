@@ -23,14 +23,46 @@ var Profile = function (obj) {
     this.registered = template.registered || (new Date()).getTime();
 
     // Statistics
-    this.gamesPlayed = template.gamesPlayed || 0;
-    this.gamesWon = template.gamesWon || 0;
-    this.flameKills = template.flameKills || 0;
-    this.shotgunKills = template.shotgunKills || 0;
-    this.gunKills = template.gunKills || 0;
-    this.laserKills = template.laserKills || 0;
-    this.grenadeKills = template.grenadeKills || 0;
-    this.timePlayed = template.timePlayed || 0;
+    this.statistics = {}
+    if (!template.statistics) template.statistics = {};
+
+    // Game statistics
+    this.statistics.gamesPlayed     = template.statistics.gamesPlayed || 0;
+    this.statistics.gamesWon        = template.statistics.gamesWon || 0;
+    this.statistics.timePlayed      = template.statistics.timePlayed || 0;
+    
+    // Kills
+    this.statistics.flameKills      = template.statistics.flameKills || 0;
+    this.statistics.shotgunKills    = template.statistics.shotgunKills || 0;
+    this.statistics.gunKills        = template.statistics.gunKills || 0;
+    this.statistics.laserKills      = template.statistics.laserKills || 0;
+    this.statistics.grenadeKills    = template.statistics.grenadeKills || 0;
+    this.statistics.totalKills      = template.statistics.totalKills || 0;
+
+    // Deaths
+    this.statistics.flameDeaths     = template.statistics.flameDeaths || 0;
+    this.statistics.shotgunDeaths   = template.statistics.shotgunDeaths || 0;
+    this.statistics.gunDeaths       = template.statistics.gunDeaths || 0;
+    this.statistics.laserDeaths     = template.statistics.laserDeaths || 0;
+    this.statistics.grenadeDeaths   = template.statistics.grenadeDeaths || 0;
+    this.statistics.totalDeaths     = template.statistics.totalDeaths || 0;
+    this.statistics.totalSuicides   = template.statistics.totalSuicides || 0;
+
+    // Multikills
+    this.statistics.multiKills      = template.statistics.multiKills || [0,0,0,0,0,0,0,0,0,0];
+    this.statistics.maxKillstreak   = template.statistics.maxKillstreak || 0;
+
+    // HitRate
+    this.statistics.flameHits       = template.statistics.flameHits || 0;
+    this.statistics.flameShots      = template.statistics.flameShots || 0;
+    this.statistics.laserShots      = template.statistics.laserShots || 0;
+    this.statistics.laserHits       = template.statistics.laserHits || 0;
+    this.statistics.shotgunShots    = template.statistics.shotgunShots || 0;
+    this.statistics.shotgunHits     = template.statistics.shotgunHits || 0;
+    this.statistics.gunShots        = template.statistics.gunShots || 0;
+    this.statistics.gunHits         = template.statistics.gunHits || 0;
+    this.statistics.grenadeShots    = template.statistics.grenadeShots || 0;
+    this.statistics.grenadeHits     = template.statistics.grenadeHits || 0;
 
     // And some database stuff
     this.databaseID = template._id || null;

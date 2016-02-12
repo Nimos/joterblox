@@ -35,6 +35,9 @@ var Player = function (game, connection, name, color) {
     this.type = "player";
     this.state = STANDING;
 
+    // Helper reference to better access statistics from other classes
+    this.profile = connection.profile;
+
     var multiKillTimer = -1;
     var multiKillCount = 0;
     var killStreak = 0;
@@ -50,25 +53,54 @@ var Player = function (game, connection, name, color) {
         lasthitby = player
     }
 
-    this.increaseScore = function(number) {
-        if (!number) number = 1;
-        connection.score += number;
+    this.increaseScore = function(number, weapon) {
+        if (!number) number = 1; // number is optional
+        connection.score += number; // increase score
 
+        // Process killstreaks and multikills
         killStreak++;
         multiKillCount++;
-        multiKillTimer = 30;
+        multiKillTimer = settings.player.multiKillTimer;
 
         var numberWords = settings.strings.multiKillNumbers;
         var message = settings.strings.multiKill;
 
+        // Post multikill message
         if (multiKillCount > 1) game.messages.push(message.replace("{name}", this.name).replace("{number}", numberWords[multiKillCount-1]));
 
+        // post Killstreak message
         if (killStreak > 1) {
             var message = (killStreak <= settings.strings.killStreak.length) ? settings.strings.killStreak[killStreak+1] : settings.strings.killStreak[settings.strings.killStreak.length-1];
             if (message) {
                 game.messages.push(message.replace("{name}", this.name));
             }
         }
+
+        // Update Profile
+        connection.profile.statistics.totalKills += 1;
+
+        switch (weapon) {
+            case "Flamethrower":
+                connection.profile.statistics.flameKills += 1;
+                break;
+            case "Laser":
+                connection.profile.statistics.laserKills += 1;
+                break;
+            case "Shotgun":
+                connection.profile.statistics.shotgunKills += 1;
+                break;
+            case "Grenade":
+                connection.profile.statistics.grenadeKills += 1;
+                break;
+            case "Gun":
+                connection.statistics.gunKills += 1;
+                break;
+            default:
+                break;
+        }
+
+        connection.profile.multiKills[multiKillCount] += 1;
+        if (connection.profile.maxKillStreak < killStreak) connection.profile.maxKillStreak = killStreak;
     }
 
     this.decreaseScore = function(number) {
@@ -155,12 +187,38 @@ var Player = function (game, connection, name, color) {
 
             // give points
             if (lasthitby) {
-                lasthitby.increaseScore();
+                lasthitby.increaseScore(1, this.lastHitby.weapon);
             } else {
                 this.decreaseScore();
+                // Update Stats
+                connection.profile.statistics.totalSuicides += 1;
             }
 
             this.active = false; // probably unneeded
+
+            // Update statistics
+
+            switch (this.lasthitby.weapon) {
+                case "Flamethrower":
+                    connection.profile.statistics.flameDeaths += 1;
+                    break;
+                case "Laser":
+                    connection.profile.statistics.laserDeaths += 1;
+                    break;
+                case "Shotgun":
+                    connection.profile.statistics.shotgunDeaths += 1;
+                    break;
+                case "Grenade":
+                    connection.profile.statistics.grenadeDeaths += 1;
+                    break;
+                case "Gun":
+                    connection.statistics.gunDeaths += 1;
+                    break;
+                default:
+                    break;
+            }
+
+            connection.profile.statistics.totalDeaths += 1;
 
             // make death sound
             game.sounds.push("death");
