@@ -62,20 +62,14 @@ var Player = function (game, connection, name, color) {
         multiKillCount++;
         multiKillTimer = settings.player.multiKillTimer;
 
-        var numberWords = settings.strings.multiKillNumbers;
-        var message = settings.strings.multiKill;
-
         // Post multikill message
         if (multiKillCount > 1) {
-            game.multiKillMessages.push(message.replace("{name}", this.name).replace("{number}", numberWords[multiKillCount-1]))
+            game.emit("message", {type: "multikill", data: {name: this.name, count: multiKillCount} });
         }
 
         // post Killstreak message
         if (killStreak > 1) {
-            var message = (killStreak <= settings.strings.killStreak.length) ? settings.strings.killStreak[killStreak+1] : settings.strings.killStreak[settings.strings.killStreak.length-1];
-            if (message) {
-                game.killStreakMessages.push(message.replace("{name}", this.name));
-            }
+            game.emit("message", {type: "killstreak", data: {name: this.name, count: killStreak} });
         }
 
         // Update Profile

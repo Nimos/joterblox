@@ -179,6 +179,10 @@ var Game = function () {
         if (tickTime > 10) console.log("[Warning] Long tick time:", tickTime, "ms");
     }
 
+    this.emit = function (type, data) {
+        io.emit(type, data);
+    };
+
     // Ends a round, starts countdown for the next
     this.endRound = function () {
         this.roundStart = (new Date).getTime();
