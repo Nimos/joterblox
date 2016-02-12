@@ -24,10 +24,11 @@ var cursor = [0, 0];
 
 // Messages that are displayed
 var messagelog = [];
-var multiKillMessage = null;
 var multiKillMessageTimeout = null;
-var killStreakMessage = null;
 var killStreakMessageTimeout = null;
+
+var lastMultiKill = null;
+var lastKillStreak = null;
 
 // Messages and sounds that are about to be displayed
 var messageQueue = [];
@@ -636,6 +637,51 @@ var drawActors = function (ctx, state) {
     } // end for
 } // end drawActors
 
+// This draws a multi kill message (for one frame)
+var drawMultiKill = function (name, count) {
+    // Get displaying text from settings
+    var text = settings.strings.multiKill;
+    text = text.replace("{name}", name).replace("{number}", settings.strings.multiKillNumbers[count-1]); // Insert data into string
+    // Draw it to the middle of the screen
+    drawProminentMessage(text); // offset and color default 0 and white
+};
+
+// This draws a killing streak message (for one frame)
+var drawKillStreak = function (name, count) {
+    // Get displaying text from settings
+    var text = (count <= settings.strings.killStreak.length) ? settings.strings.killStreak[count+1] : settings.strings.killStreak[settings.strings.killStreak.length-1];
+    // Killing spree text is only available for some numbers
+    if (text) {
+        text = text.replace("{name}", name); // Insert data into string
+        // Draw it to the middle of the screen (with another color and some offset)
+        drawProminentMessage(text, settings.client.killStreakMessageColor, settings.client.prominentMessagesSpacing);
+    }
+};
+
+// This draws a bigass message to the middle of the screen
+var drawProminentMessage = function(text, color, yOffset) {
+    color = color || "white";
+    yOffset = yOffset || 0;
+    /* Draw it to the big screen */
+    ctx.font = "16px PressStart2P";
+    ctx.textAlign = "center";
+    ctx.strokeStyle = "black";
+    ctx.lineWidth = 2;
+
+    var yPos = settings.client.prominentMessagesY;
+
+    // Border
+    ctx.strokeText(text, c.width / 2, yPos + yOffset);
+
+    // Shadow
+    ctx.fillStyle = "black";
+    ctx.fillText(text, c.width / 2 + 2, yPos + yOffset + 2);
+
+    // Text
+    ctx.fillStyle = color;
+    ctx.fillText(text, c.width / 2, yPos + yOffset);
+};
+
 var drawHUD = function (ctx, hud) {
     // Draw messages in messagelog
     for (var i = 0; i < messagelog.length; i++) {
@@ -650,38 +696,15 @@ var drawHUD = function (ctx, hud) {
     ctx.strokeStyle = "black";
     ctx.lineWidth = 2;
 
-    var yPos = settings.client.prominentMessagesY;
-    var spacing = settings.client.prominentMessagesSpacing;
-
-    // Draw messages in multikill messagelog
-    if (multiKillMessage) {
-        // Border
-        ctx.strokeText(multiKillMessage, c.width / 2, yPos);
-
-        // Shadow
-        ctx.fillStyle = "black";
-        ctx.fillText(multiKillMessage, c.width / 2 + 2, yPos + 2);
-
-        // Text
-        ctx.fillStyle = settings.client.multiKillMessageColor;
-        ctx.fillText(multiKillMessage, c.width / 2, yPos);
-
+    // If there was a kill streak in the last (see settings) seconds, draw it
+    if (lastKillStreak) {
+        drawKillStreak(lastKillStreak.name, lastKillStreak.count);
     }
 
-    if (killStreakMessage) {
-        // Border
-        ctx.strokeText(killStreakMessage, c.width/2, yPos + spacing);
-
-        // Shadow
-        ctx.fillStyle = "black";
-        ctx.fillText(killStreakMessage, c.width / 2 + 2, yPos + spacing + 2);
-
-        // Text
-        ctx.fillStyle = settings.client.killStreakMessageColor;
-        ctx.fillText(killStreakMessage, c.width / 2, yPos + spacing);
+    // If there was a multikill in the last (see settings) seconds, draw it
+    if (lastMultiKill) {
+        drawMultiKill(lastMultiKill.name, lastMultiKill.count);
     }
-
-
 
     // Draw bottom bar
     ctx.fillStyle = "#444";
@@ -1036,24 +1059,6 @@ var handleUpdate = function (s) {
         setTimeout("messagelog.shift()", 10000); // Remove new message entry after 10 seconds
     }
 
-    var q = s.multiKillMessages;
-    for (var i = 0; i < q.length; i++) {
-        console.log("Multikill: "+q[i]);
-        multiKillMessage = q[i];
-        if (multiKillMessageTimeout) clearTimeout(multiKillMessageTimeout);
-        multiKillMessageTimeout = setTimeout(function() {
-            multiKillMessage = null;
-        }, settings.client.multiKillMessageDisplayTime); // Remove message entry after time is over
-    }
-
-    var q = s.killStreakMessages;
-    for (var i = 0; i < q.length; i++) {
-        console.log("Killstreak: "+q[i]);
-        killStreakMessage = q[i];
-        if(killStreakMessageTimeout) clearTimeout(killStreakMessageTimeout);
-        killStreakMessageTimeout = setTimeout("killStreakMessage = null", settings.client.killStreakMessageDisplayTime); // Remove message entry after time is over
-    }
-
     // And the many things that are about drawing...
 
     // draw the game
@@ -1091,6 +1096,33 @@ var connect = function () {
     sock = io(window.location.hostname+":"+settings.gameServer.port, {"query": "sessionID="+sessionID});
     sock.on("update", handleUpdate);
     sock.on("loadMap", loadMap);
+
+    // Some message to display
+    sock.on("message", function(data) {
+        switch(data.type) {
+            // Somebody is on a kill streak
+            case "killstreak":
+                if (killStreakMessageTimeout) clearTimeout(killStreakMessageTimeout);
+                lastKillStreak = data.data;
+                killStreakMessageTimeout = setTimeout("lastKillStreak = null", settings.client.killStreakMessageDisplayTime);
+                break;
+            // Somebody scored a multikill
+            case "multikill":
+                if (multiKillMessageTimeout) clearTimeout(multiKillMessageTimeout);
+                lastMultiKill = data.data;
+                multiKillMessageTimeout = setTimeout("lastMultiKill = null", settings.client.multiKillMessageDisplayTime);
+                break;
+            /* Probably want to add this later
+            // A message was sent
+            case "message":
+                drawMessage(data.message);
+                break;
+            */
+            // Something else
+            default:
+                console.log(data);
+        }
+    });
 
     // I had weird problems naming those "ping" and "pong", maybe socket.io internally uses those? they disappeared after I renamed them to that
     sock.on("pung", function (time) {

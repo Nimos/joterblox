@@ -76,7 +76,7 @@ var settings = {
         // Prominent message display
         "killStreakMessageColor": "#B80000",
         "multiKillMessageColor": "white",
-        "killStreakMessageDisplayTime": 7500, // in ms
+        "killStreakMessageDisplayTime": 5000, // in ms
         "multiKillMessageDisplayTime": 5000, // in ms
         "prominentMessagesY": 100, // y-pos of those two messages
         "prominentMessagesSpacing": 40, // spacing of the lines
