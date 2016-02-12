@@ -211,7 +211,7 @@ var Player = function (game, connection, name, color) {
                     connection.profile.statistics.grenadeDeaths += 1;
                     break;
                 case "Gun":
-                    connection.statistics.gunDeaths += 1;
+                    connection.profile.statistics.gunDeaths += 1;
                     break;
                 default:
                     break;
