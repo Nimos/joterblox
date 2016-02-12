@@ -98,9 +98,8 @@ var Player = function (game, connection, name, color) {
             default:
                 break;
         }
-
-        connection.profile.multiKills[multiKillCount] += 1;
-        if (connection.profile.maxKillStreak < killStreak) connection.profile.maxKillStreak = killStreak;
+        connection.profile.statistics.multiKills[multiKillCount] += 1;
+        if (connection.profile.statistics.maxKillStreak < killStreak) connection.profile.maxKillStreak = killStreak;
     }
 
     this.decreaseScore = function(number) {
@@ -187,7 +186,7 @@ var Player = function (game, connection, name, color) {
 
             // give points
             if (lasthitby) {
-                lasthitby.increaseScore(1, this.lastHitby.weapon);
+                lasthitby.increaseScore(1, this.lasthitby.weapon);
             } else {
                 this.decreaseScore();
                 // Update Stats
