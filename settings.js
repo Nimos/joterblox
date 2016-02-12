@@ -13,6 +13,12 @@ var settings = {
         "multikillTimer": 30, // how many ticks between kills to count as multikill
     },
 
+    "leveling": {
+        "winXP": 50,
+        "roundXP": 100,
+        "levels": [0,100,210,330,460,670,890,1100]
+    },
+
     "gameServer": {
         "randomMapList": ["akirajungle"], // map to be selected in the random rotation,
         "roundTimer": 120, // how long one round lasts in seconds
@@ -47,7 +53,7 @@ var settings = {
         "hudReloadColor1": "rgb(70, 165, 215)",
         "hudReloadColor2": "rgb(55, 128, 161)",
         "hudInactiveColor": "rgb(50,50,50)",
-        "hudHpColor1": "rgb(18, 170, 83)",
+        "hudHpColor1":  "rgb(18, 170, 83)",
         "hudHpColor2": "rgb(50,50,50)",
         "hudBarTextColor": "#fff",
         "hudBarFont": "16px PressStart2P",
@@ -58,11 +64,7 @@ var settings = {
 
         // Scoreboard
         "scoreBoardSelfColor": "cyan", // color of self in scoreboard
-        "scoreBoardTextColor": "white", // color of all others in scoreboard
-        "scoreBoardHeight": 416, // height of the scoreboard
-        "scoreBoardWidth": 600, // height of the scoreboard
-        "scoreBoardMaxPlayers": 20 // doesnt really support any more
-
+        "scoreBoardTextColor": "white" // color of all others in scoreboard
     },
 
     "pingDisplay": {
@@ -94,6 +96,6 @@ var settings = {
         "playerTimeout": "{name}'s connection timed out.",
         "playerQuit": "{name} has left the game.",
     }
-};
+}
 
 module.exports = settings;

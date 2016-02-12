@@ -180,13 +180,22 @@ var Game = function () {
         this.roundStart = (new Date).getTime();
         setTimeout(this.init.bind(this), waitTime*1000)
         this.state = 2;
-        this.leader.profile.statistics.gamesWon += 1;
+
+        if (connections.length > 1) this.leader.profile.statistics.gamesWon += 1;
         
         // Save profiles
         for (var i=0; i<connections.length; i++) {
             var c = connections[i];
             
-            c.profile.statistics.gamesPlayed += 1;
+            if (connections.length > 1) {
+                c.profile.statistics.gamesPlayed += 1;
+                c.profile.experience += settings.leveling.roundXP;
+
+                if (this.leader === c) {
+                    c.profile.experience += settings.leveling.winXP;
+                }
+            }
+
             c.profile.save();
         }
 
