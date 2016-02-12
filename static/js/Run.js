@@ -789,45 +789,76 @@ String.prototype.makeLength = function(length, fillChar, changeSide) {
 
 var scoreboard;
 var drawScoreboard = function (ctx, state) {
+    var maxPlayers = settings.client.scoreBoardMaxPlayers;
+    var scoreBoardWidth = settings.client.scoreBoardWidth;
+    var scoreBoardHeight = settings.client.scoreBoardHeight;
+
+    var scoreBoardX = map.size[0] / 2 - scoreBoardWidth / 2;
+    var scoreBoardY = map.size[1] / 2 - scoreBoardHeight / 2;
+
     scoreboard = state.users.sort(function (a, b) {
         return (b.score - a.score)
     });
+
+    // Draw background
     ctx.fillStyle = "rgba(40,40,40,0.8)";
-    ctx.fillRect(200, 100, c.width - 400, c.height - 200);
-    ctx.strokeStyle = "#000";
-    ctx.strokeRect(200, 100, c.width - 400, c.height - 200);
-    //ctx.fillStyle = "white";
+    ctx.fillRect(scoreBoardX, scoreBoardY, scoreBoardWidth, scoreBoardHeight);
+    ctx.strokeStyle = "black";
+    ctx.lineWidth = 2;
+    ctx.strokeRect(scoreBoardX, scoreBoardY, scoreBoardWidth, scoreBoardHeight);
+
     ctx.textAlign = "start";
     ctx.font = "15px PressStart2P";
-    var n = 0;
+    var unjoinedPlayers = 0;
+    var hiddenPlayers = 0;
 
+    var selfFound = false; // Has the player been written in the scoreboard yet?
+
+    // Iterate through all players
     for (var i = 0; i < scoreboard.length; i++) {
         s = scoreboard[i];
-        // Only display top 20 joined players
-        if (s.joined && i-n+1 <= 20) {
-            ctx.font = "15px PressStart2P";
-            ctx.fillStyle = "black";
-
-            // 1st, 2nd, etc.
-            var rank = ((i - n + 1) + ordinalString(i - n + 1)).makeLength(4, " ", "left");
-            // ..., -01, 000, 001, ...
-            var score = s.score>=0 ? (s.score + "").makeLength(3, "0", "left") : "-"+((-s.score + "").makeLength(2, "0", "left"));
-            // PLAYERNAME--------------- (filled up with - to max length)
-            var name = s.name.makeLength(settings.playerConnection.maxNameLength, "-");
-
-            // Shadow
-            ctx.fillText(rank + " " + score + " " + name, 230 + 2, 125 + 2 + (i - n) * 20);
-            // Red if self
-            ctx.fillStyle = hud.self == s.uID ? settings.client.scoreBoardSelfColor : settings.client.scoreBoardTextColor;
-
-            // Text
-            ctx.fillText(rank + " " + score + " " + name, 230, 125 + (i - n) * 20);
-
-            // Latency display in Scoreboard (No text)
-            var playerPing = new PingDisplay(ctx, 740, c.height-(123+(i-n)*20), s.ping, 3);
-            playerPing.draw();
+        // Display top joined players + self (at the end if no place in list)
+        if (!s.joined) {
+            // Player has not joined yet
+            unjoinedPlayers++;
+            continue;
         } else {
-            n++;
+            // Player has joined
+            if (i-unjoinedPlayers+hiddenPlayers >= maxPlayers && selfFound) {
+                // Player is displayed and all sb-slots are full
+                break;
+            } else if (hud.self != s.uID && !selfFound && i-unjoinedPlayers+hiddenPlayers+1 >= maxPlayers) {
+                // There is only space for 1 more who has to be the player
+                hiddenPlayers++;
+                continue;
+            } else {
+                if (hud.self == s.uID) {
+                    // It's a me
+                    selfFound = true;
+                }
+
+                // Font for scoreboard entries
+                ctx.font = "15px PressStart2P";
+                ctx.fillStyle = "black";
+
+                // 1st, 2nd, etc.
+                var rank = ((i - unjoinedPlayers + 1) + ordinalString(i - unjoinedPlayers + 1)).makeLength(4, " ", "left");
+                // ..., -01, 000, 001, ...
+                var score = s.score >= 0 ? (s.score + "").makeLength(3, "0", "left") : "-" + ((-s.score + "").makeLength(2, "0", "left"));
+                // PLAYERNAME--------------- (filled up with - to max length)
+                var name = s.name.makeLength(settings.playerConnection.maxNameLength, "-");
+
+                // Shadow
+                ctx.fillText(rank + " " + score + " " + name, scoreBoardX + 30 + 2, scoreBoardY + 27 + 2 + (i - unjoinedPlayers - hiddenPlayers) * 20);
+                // Red if self
+                ctx.fillStyle = hud.self == s.uID ? settings.client.scoreBoardSelfColor : settings.client.scoreBoardTextColor;
+                // Text
+                ctx.fillText(rank + " " + score + " " + name, scoreBoardX + 30, scoreBoardY + 27 + (i - unjoinedPlayers - hiddenPlayers) * 20);
+
+                // Latency display in Scoreboard (No text)
+                var playerPing = new PingDisplay(ctx, scoreBoardX + 550, c.height - (scoreBoardY + 24 + (i - unjoinedPlayers - hiddenPlayers) * 20), s.ping, 3);
+                playerPing.draw();
+            }
         }
     }
 };
