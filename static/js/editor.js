@@ -45,6 +45,7 @@ var cursor = [0, 0];
 var rects = [];
 var spawns = [];
 var powerups = [];
+var objects = [];
 var killZones = [];
 var hist = [];
 var ctx = c.getContext("2d")
@@ -102,6 +103,17 @@ var draw = function () {
     ctx.fillText(s[2][0],s[0]-5,s[1]+5);
   }
 
+  for (var i=0; i<objects.length; i++) {
+    var s = objects[i];
+    ctx.fillStyle = "#0ff";
+    ctx.fillRect(s[0]-10, s[1]-10, 20, 20);
+    ctx.strokeRect(s[0]-10, s[1]-10, 20, 20);
+    ctx.fillStyle = "black";
+    ctx.font = "16px sans-serif"
+    ctx.fillText(s[2][0],s[0]-5,s[1]+5);
+  }
+  
+
   drawCursor();
   requestAnimationFrame(draw);
 }
@@ -133,7 +145,11 @@ c.addEventListener("mousedown", function(e){
   } else if (tool.value == "p") {
     hist.push("p");
     powerups.push([e.offsetX, e.offsetY,pselect.value]);
+  } else if (tool.value == "o") {
+    hist.push("o");
+    objects.push([e.offsetX, e.offsetY,oselect.value]);
   }
+
   generateResult();
 }, false);
 c.addEventListener("mousemove", function(e){
@@ -176,6 +192,8 @@ c.addEventListener("contextmenu", function (e) {
     spawns.pop();
   } else if (t=="p") {
     powerups.pop();
+  } else if (t=="o") {
+    objects.pop();
   }
   generateResult();
   e.preventDefault();
@@ -253,6 +271,14 @@ var generateResult = function () {
     result["powerups"].push(r);
   }
 
+  result["objects"] = []
+  for (var i=0; i<objects.length; i++) {
+    var r = [objects[i][0], objects[i][1], objects[i][2]];
+    r[1] = height-r[1];
+    result["objects"].push(r);
+  }
+
+
   result["spawns"] = []
   console.log(spawns)
   for (var i=0; i<spawns.length; i++) {
@@ -298,6 +324,12 @@ document.getElementById('result').oninput = function (e) {
     r[1] = height-r[1];
     powerups.push(r);
   }
+  objects = []
+  for (var i=0; i<m.objects.length; i++) {
+    var r=m.objects[i];
+    r[1] = height-r[1];
+    objects.push(r);
+  }
   spawns = []
   for (var i=0; i<m.spawns.length; i++) {
     var r=m.spawns[i];
@@ -314,12 +346,15 @@ bs2.onchange = generateResult;
 bs3.onchange = generateResult;
 
 tool.onchange = function () {
+  pselectdiv.style = "display: none;"
+  oselectdiv.style = "display: none;"
   if (this.value == "p") {
     pselectdiv.style = "";
-  } else {
-    pselectdiv.style = "display: none;"
+  } else if (this.value == "o") {
+    oselectdiv.style = "";
   }
 }
+
 
 generateResult();
 draw();

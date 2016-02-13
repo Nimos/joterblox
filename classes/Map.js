@@ -1,5 +1,5 @@
 var settings = require("../settings");
-var Jumper = require("./MapEntity").jumper;
+var mapEntities = require("./MapEntity");
 // Only one hardcoded map for now, should be able to load different layouts later
 var Map = function (game, mapname) {
     // Defining a map as a size and a set of rectangles
@@ -33,7 +33,12 @@ var Map = function (game, mapname) {
         if (m.spawns) playerSpawns = m.spawns;
         if (m.killZones) killZones = m.killZones;
 
-        new Jumper(game, [30,10])
+        if (m.objects) {
+            for (var i=0;i<m.objects.length;i++) {
+                var o = m.objects[i];
+                new mapEntities[o[2]](game, [o[0], o[1]])
+            }
+        }
 
         return true;
     }

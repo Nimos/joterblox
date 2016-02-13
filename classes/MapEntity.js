@@ -1,7 +1,7 @@
 var settings = require("../settings");
 
 // Various actors spawned by the map to interact with things
-var Jumper = function (game, pos, name) {
+var Jumper = function (game, pos) {
     this.type = "jumper";
     this.active = true;
     this.pos = pos;

@@ -10,7 +10,7 @@ var settings = {
         "jumpSpeed": 20, // how much upwards speed to add when jump is pressed
         "gravity": 2, // how much to accellerate downwards every tick
         "hitBoxSize": 10, // size of player hitbox
-        "multikillTimer": 30, // how many ticks between kills to count as multikill
+        "multiKillTimer": 30, // how many ticks between kills to count as multikill
     },
 
     "leveling": {
@@ -76,7 +76,7 @@ var settings = {
         // Prominent message display
         "killStreakMessageColor": "#B80000",
         "multiKillMessageColor": "white",
-        "killStreakMessageDisplayTime": 5000, // in ms
+        "killStreakMessageDisplayTime": 7500, // in ms
         "multiKillMessageDisplayTime": 5000, // in ms
         "prominentMessagesY": 100, // y-pos of those two messages
         "prominentMessagesSpacing": 40, // spacing of the lines
