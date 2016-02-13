@@ -80,7 +80,7 @@ var gfxpreload = [
     "/assets/images/entername.png", 
     "/assets/images/akirabg.png", 
     "/assets/images/akirafg.png",
-    ["/assets/images/jumper.png", 15, 20, 6, 1]
+    ["/assets/images/jumper.png", 18, 20, 5, 1]
 ];
 
 var sfxpreload = [
