@@ -958,7 +958,7 @@ var drawEndscreen = function (ctx) {
     var cornerY = c.height/2 - roundOverHeight/2;
     
     // Background Box
-    ctx.fillStyle = "rgba(255, 255, 255, 0.6)";
+    ctx.fillStyle = "rgba(40,40,40,0.8)";
     ctx.strokeStyle = "#000";
     ctx.fillRect(c.width/2 - roundOverWidth/2, c.height/2 - roundOverHeight/2, roundOverWidth, roundOverHeight)
     ctx.lineWidth=4;
@@ -973,7 +973,7 @@ var drawEndscreen = function (ctx) {
     ctx.font = "24px PressStart2P"
     ctx.textAlign = "left"
     ctx.fillStyle = "white";
-    ctx.coolText("Scoreboard", cornerX+8, cornerY+38);
+    ctx.coolText("Scoreboard", cornerX+12, cornerY+38);
 
     ctx.font = "8px PressStart2P";
     var n=0;
@@ -987,18 +987,24 @@ var drawEndscreen = function (ctx) {
     }
 
     // Map Winner
+    ctx.font = "24px PressStart2P";
+    ctx.textAlign = "center";
+    ctx.coolText("Round winner", cornerX+roundOverWidth-195, cornerY+38);
     ctx.font = "16px PressStart2P";
-    ctx.textAlign = "right";
-    ctx.coolText("This  round goes to...", roundOverWidth+cornerX - 20, cornerY+38);
-    ctx.font = "16px PressStart2P";
-    ctx.textAlign = "center"
-    ctx.coolText(scoreboard[0].name, cornerX+roundOverWidth-195, cornerY+100)
+    ctx.textAlign = "center";
+    ctx.coolText(scoreboard[0].name, cornerX+roundOverWidth-195, cornerY+75)
+    sprites.draw(ctx, "/assets/images/characters/filk.png", cornerX+roundOverWidth-195 - 16, cornerY+100-16, 32, 32);
     
     
     // Map Vote    
     ctx.font = "16px PressStart2P";
-    ctx.textAlign = "right";
-    ctx.coolText("Vote for the next map:", cornerX+roundOverWidth-20, cornerY+200);
+    ctx.textAlign = "left";
+    ctx.coolText("Vote for the next map", cornerX+roundOverWidth-370, cornerY+200);
+    ctx.fillStyle = "black";
+    ctx.fillRect(cornerX+roundOverWidth-195-1, cornerY+220-1, 175+3, 100+3);
+    ctx.fillRect(cornerX+roundOverWidth-375-1, cornerY+220-1, 175+3, 100+3);
+    ctx.fillRect(cornerX+roundOverWidth-195-1, cornerY+325-1, 175+3, 100+3);
+    ctx.fillRect(cornerX+roundOverWidth-375-1, cornerY+325-1, 175+3, 100+3);
     sprites.draw(ctx, "/assets/images/akirabg.png", cornerX+roundOverWidth-195, cornerY+220, 175, 100)
     sprites.draw(ctx, "/assets/images/akirabg.png", cornerX+roundOverWidth-375, cornerY+220, 175, 100)
     sprites.draw(ctx, "/assets/images/akirabg.png", cornerX+roundOverWidth-195, cornerY+325, 175, 100)
@@ -1006,18 +1012,12 @@ var drawEndscreen = function (ctx) {
 
 
     // Timer
-    ctx.font = "24px PressStart2P"
+    ctx.font = "16px PressStart2P"
     var s = Math.floor(state.timeRemaining/1000);
-    ctx.textAlign = "right";
-    ctx.coolText("Next map in "+s+"...", cornerX+roundOverWidth-30, cornerY+roundOverHeight-10);
-    
-    // Above Text
-    ctx.fillStyle = "white"
-    ctx.textAlign = "center"
-    ctx.font = "32px PressStart2P";
-    ctx.coolText("Round over", c.width / 2, 50);
-
-}
+    ctx.textAlign = "left";
+    ctx.fillStyle = "white";
+    ctx.coolText("Next map in "+s+"...", cornerX+roundOverWidth-370, cornerY+roundOverHeight-20);
+};
 
 var chatActive = false;
 // Show chat input and make it active
