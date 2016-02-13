@@ -5,6 +5,7 @@
 		<meta name="description" content="Joter Blox is a web based multiplayer game that lets you compete with your friends in a small battle arena">
 		<meta name="author" content="#YOLO Entertainment">
 		<link rel="stylesheet" href="/static/css/styles.css?v=1.0">
+		<link rel="stylesheet" href="/static/css/fancy-tooltips.css">
 		<link rel="icon" href="/static/images/favicon.png">
 	</head>
 	<body>
@@ -15,6 +16,18 @@
 		<input type="range" id="c1" min="0" max="255"> <input type="range" id="c2" min="0" max="255"> <input type="range" id="c3" min="0" max="255">
 		<a href="#" class="link-button" id="colorclick"><span>Change color upon death!</span></a>
 		<br>
+		<div id="links">
+			<li class="hint--top" data-hint="Check out Joter Blox on GitHub">
+				<a href="https://github.com/Nimos/joterblox/">
+					<img src="/static/images/github_mark.png" alt="GitHub Mark" />
+				</a>
+			</li>
+			<li class="hint--top" data-hint="Chat with cool people on Quakenet IRC">
+				<a href="http://webchat.quakenet.org/?channels=joterblox" target="_blank">
+					<img src="/static/images/irc.png" alt="IRC Icon" />
+				</a>
+			</li>
+		</div>
 		<script src="/socket.io/socket.io.js"></script>
 		<script src="/settings"></script>
 		<script src="/static/js/Run.js"></script>

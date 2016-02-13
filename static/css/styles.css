@@ -4,14 +4,15 @@ body {
 	min-width:1290px;
 	background-color:#111629;
 	color:white;
+	font-family: sans-serif;
+}
+canvas {
 	/* Scale pictures by using nearest-neighbor interpolation for real 8bit feeling */
 	-ms-interpolation-mode: nearest-neighbor; /* Internet Explorer (non-standard property) */
 	image-rendering: -moz-crisp-edges; /* Firefox does not support pixelated (yet) */
 	image-rendering: -webkit-optimize-contrast; /* Safari, equals to crisp-edges (non-standard naming) */
 	image-rendering: pixelated; /* Chrome, Opera */
 
-}
-canvas {
 	border: 3px solid black;
 	background-color:white;
 	margin:0 0 25px;
@@ -52,4 +53,29 @@ canvas:hover {
 @font-face {
     font-family: 'PressStart2P';
     src: url('/assets/PressStart2P.ttf') format('truetype');
+}
+#links {
+	position:fixed;
+	left:0;
+	bottom:0;
+	height:50px;
+	width:100%;
+	background-color:#111629;
+	padding-top: 10px;
+}
+
+#links li {
+	list-style-type: none;
+	display: inline-block;
+	padding: 0 10px 0 10px;
+}
+
+#links img {
+	max-height: 40px;
+	margin-bottom: 5px;
+}
+
+#links a {
+	text-decoration:none;
+	color:white;
 }
