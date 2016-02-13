@@ -339,9 +339,9 @@ var CanvasInput = function (ctx, name, x, y, width) {
             // Move text to the right to center it
             // Text will always be centered without considering the trailing "_" or " "
             // If there is no text the lone underscore will be centered.
-            if (this.text.length == this.maxLength) {
+            if (this.text && this.text.length == this.maxLength) {
                 myX = this.x;
-            } else if (this.text.length > 0) {
+            } else if (this.text && this.text.length > 0) {
                 // That's 50% of the character width for monospace fonts
                 myX = this.x + 0.275 * this.fontSize;
             } else {
