@@ -481,13 +481,9 @@ var PingDisplay = function(ctx, x, y, ping, size, showText) {
             ctx.font = 4 * this.size + "px PressStart2P";
             ctx.textAlign = "left";
 
-            // Shadow
-            ctx.fillStyle = "black";
-            ctx.fillText(ping, this.x + 5 * this.size * 1.5 + 2, c.height - this.y + 2);
-
             // Text
             ctx.fillStyle = this.color;
-            ctx.fillText(ping, this.x + 5 * this.size * 1.5, c.height - this.y);
+            ctx.coolText(ping, this.x + 5 * this.size * 1.5, c.height - this.y);
         }
     }
 };
@@ -577,9 +573,10 @@ var drawActors = function (ctx, state) {
             ctx.fillRect(a.pos[0] - pSize/3, map.size[1] - a.pos[1] - pSize/3, 2*pSize/3, 2*pSize/3)
 
             ctx.textAlign = "center";
-            ctx.font = "10px sans-serif"
+            ctx.font = "8px PressStart2P"
+            ctx.fillStyle = "white";
+            ctx.coolText(a.name, a.pos[0], map.size[1] - (a.pos[1] + 20), 1);
             ctx.fillStyle = "black";
-            ctx.fillText(a.name, a.pos[0], map.size[1] - (a.pos[1] + 20));
             ctx.fillRect(a.pos[0] - 10, map.size[1] - (a.pos[1] + 15), 20, 5)
             ctx.fillStyle = "#00CC00";
             ctx.fillRect(a.pos[0] - 9, map.size[1] - (a.pos[1] + 14), 18 * (a.hp / 100), 3)
@@ -595,19 +592,19 @@ var drawActors = function (ctx, state) {
 
             // Then add letter describing what's in it
             ctx.textAlign = "left"
-            ctx.fillStyle = "black"
-            ctx.font = "20px sans-serif"
+            ctx.fillStyle = "white"
+            ctx.font = "16px PressStart2P"
             ctx.fontSize = 20;
             if (a.content == "flamethrower") {
-                ctx.fillText("F", a.pos[0] - 10, map.size[1] - a.pos[1] + 8);
+                ctx.coolText("F", a.pos[0] - 8, map.size[1] - a.pos[1] + 8, 1);
             } else if (a.content == "grenades") {
-                ctx.fillText("G", a.pos[0] - 10, map.size[1] - a.pos[1] + 8);
+                ctx.coolText("G", a.pos[0] - 8, map.size[1] - a.pos[1] + 8, 1);
             } else if (a.content == "laser") {
-                ctx.fillText("L", a.pos[0] - 10, map.size[1] - a.pos[1] + 8);
+                ctx.coolText("L", a.pos[0] - 8, map.size[1] - a.pos[1] + 8, 1);
             } else if (a.content == "shotgun") {
-                ctx.fillText("S", a.pos[0] - 10, map.size[1] - a.pos[1] + 8);
+                ctx.coolText("S", a.pos[0] - 8, map.size[1] - a.pos[1] + 8, 1);
             } else if (a.content == "medipack") {
-                ctx.fillText("M", a.pos[0] - 10, map.size[1] - a.pos[1] + 8);
+                ctx.coolText("M", a.pos[0] - 8, map.size[1] - a.pos[1] + 8, 1);
             }
 
 
@@ -670,25 +667,17 @@ var drawProminentMessage = function(text, color, yOffset) {
 
     var yPos = settings.client.prominentMessagesY;
 
-    // Border
-    ctx.strokeText(text, c.width / 2, yPos + yOffset);
-
-    // Shadow
-    ctx.fillStyle = "black";
-    ctx.fillText(text, c.width / 2 + 2, yPos + yOffset + 2);
-
-    // Text
     ctx.fillStyle = color;
-    ctx.fillText(text, c.width / 2, yPos + yOffset);
+    ctx.coolText(text, c.width / 2, yPos + yOffset)
 };
 
 var drawHUD = function (ctx, hud) {
     // Draw messages in messagelog
     for (var i = 0; i < messagelog.length; i++) {
-        ctx.fillStyle = "black";
-        ctx.font = "10px sans-serif"
+        ctx.fillStyle = "lightgrey";
+        ctx.font = "8px PressStart2P"
         ctx.textAlign = "start";
-        ctx.fillText(messagelog[i], 10, 15 + 15 * i);
+        ctx.coolText(messagelog[i], 10, 15 + 15 * i, 1);
     }
 
     ctx.font = "16px PressStart2P";
@@ -729,7 +718,7 @@ var drawHUD = function (ctx, hud) {
     ctx.fillStyle = hudBarTextColor;
     ctx.textAlign = "center";
     ctx.font = hudBarFont
-    ctx.fillText(hud.hp +"/100", c.width/2, c.height)
+    ctx.coolText(hud.hp +"/100", c.width/2, c.height, 1)
 
     // Weapon ammo display, if we have one
     if (hud.weapon) {
@@ -743,7 +732,7 @@ var drawHUD = function (ctx, hud) {
         ctx.fillStyle = hudBarTextColor;
         ctx.textAlign = "center";
         ctx.font = hudBarFont
-        ctx.fillText(hud.weapon.ammo +"/"+hud.weapon.maxAmmo, c.width/2, c.height-(hudBarHeight+1))
+        ctx.coolText(hud.weapon.ammo +"/"+hud.weapon.maxAmmo, c.width/2, c.height-(hudBarHeight+1))
 
         // Reload cooldown
         ctx.fillStyle = hudReloadColor2;
@@ -759,7 +748,7 @@ var drawHUD = function (ctx, hud) {
             ctx.fillStyle = hudBarTextColor;
             ctx.textAlign = "center";
             ctx.font = hudBarFont
-            ctx.fillText( ((hud.weapon.ammoRecharge-hud.weapon.ammoTicks)/33.33).toFixed(2)+"s" , c.width/2, c.height-2*(hudBarHeight+1))     
+            ctx.coolText( ((hud.weapon.ammoRecharge-hud.weapon.ammoTicks)/33.33).toFixed(2)+"s" , c.width/2, c.height-2*(hudBarHeight+1))
         }  
     } else {
         ctx.fillStyle = hudInactiveColor
@@ -772,6 +761,7 @@ var drawHUD = function (ctx, hud) {
         ctx.font = "15px sans-serif";
         ctx.textAlign = "center";
         hud.playerY = map.size[1] - hud.playerY; // 80%
+        // Something weird happened when I replaced this with coolText
         ctx.fillStyle = "black";
         ctx.fillText("▼", hud.playerX + 2, hud.playerY - 30 + 2);
         ctx.fillStyle = "#f0f";
@@ -787,10 +777,10 @@ var drawHUD = function (ctx, hud) {
         s = ("0"+s).substr(-2,2);
         t %= 1000;
         var m = Math.floor(t/100);
-        ctx.fillStyle = "black";
+        ctx.fillStyle = "white";
         ctx.font = "16px PressStart2P";
         ctx.textAlign = "left"
-        ctx.fillText("Time: "+mins+":"+s, c.width/2 + hudBarWidth/2 +2, c.height-(hudBarHeight+1))
+        ctx.coolText("Time: "+mins+":"+s, c.width/2 + hudBarWidth/2 +2, c.height-(hudBarHeight+1));
     }
 
     // Input for the chat
@@ -799,18 +789,40 @@ var drawHUD = function (ctx, hud) {
     }
 }
 
+// Draw text with border and shadow in a really cool looking way
+CanvasRenderingContext2D.prototype.coolText = function(text, x, y, shadowSize) {
+    shadowSize = shadowSize || 2; // default 2
+
+    if (!text || !x || !y)
+        throw new TypeError("Failed to execute 'coolText' on 'CanvasRenderingContext2D': 3 arguments required, but only "+arguments.length+ " present");
+
+    ctx.strokeStyle = "black";
+    ctx.lineWidth = 2;
+
+    var color = ctx.fillStyle;
+
+    // Border
+    ctx.strokeText(text, x, y);
+
+    // Shadow
+    ctx.fillStyle = "black";
+    ctx.fillText(text, x + shadowSize, y + shadowSize);
+
+    // Text
+    ctx.fillStyle = color;
+    ctx.fillText(text, x, y);
+};
+
 var drawDeathScreen = function (ctx, hud) {
-    ctx.fillStyle = "black"
-    ctx.strokeStyle = "white"
+    ctx.fillStyle = "white";
     ctx.textAlign = "center"
     ctx.font = "40px PressStart2P"
-    ctx.fillText("You are dead.", c.width / 2, c.height / 2 - 25);
-    ctx.strokeText("You are dead.", c.width / 2, c.height / 2 - 25);
+    ctx.coolText("You are dead.", c.width / 2, c.height / 2 -25);
     ctx.font = "24px PressStart2P"
     if (hud.respawn > 40) {
-        ctx.fillText("Press any key to respawn.", c.width / 2, c.height / 2 + 25)
-        ctx.strokeText("Press any key to respawn.", c.width / 2, c.height / 2 + 25)
+        ctx.coolText("Press any key to respawn.", c.width/2, c.height / 2 + 25);
     } else {
+        ctx.strokeStyle = "black";
         ctx.beginPath();
         ctx.moveTo(c.width / 2, c.height / 2 + 25);
         ctx.arc(c.width / 2, c.height / 2 + 25, 30, 0, 2 * Math.PI * (hud.respawn / 40));
@@ -837,7 +849,7 @@ var ordinalString = function(number) {
 String.prototype.makeLength = function(length, fillChar, changeSide) {
     // Wow, error handling!
     if (!length)
-        throw new Error("Missing parameter: length");
+        throw new TypeError("Failed to execute 'makeLength' on 'String': 1 argument required, but only "+arguments.length+ " present");
 
     // Let's go
     fillChar = fillChar || " "; // Set whitespace as default if no value is given
@@ -925,12 +937,10 @@ var drawScoreboard = function (ctx, state) {
                 // PLAYERNAME--------------- (filled up with - to max length)
                 var name = s.name.makeLength(settings.playerConnection.maxNameLength, "-");
 
-                // Shadow
-                ctx.fillText(rank + " " + score + " " + name, scoreBoardX + 30 + 2, scoreBoardY + 27 + 2 + (i - unjoinedPlayers - hiddenPlayers) * 20);
-                // Red if self
+                // Other color if self
                 ctx.fillStyle = hud.self == s.uID ? settings.client.scoreBoardSelfColor : settings.client.scoreBoardTextColor;
-                // Text
-                ctx.fillText(rank + " " + score + " " + name, scoreBoardX + 30, scoreBoardY + 27 + (i - unjoinedPlayers - hiddenPlayers) * 20);
+
+                ctx.coolText(rank + " " + score + " " + name, scoreBoardX + 30, scoreBoardY + 27 + (i - unjoinedPlayers - hiddenPlayers) * 20);
 
                 // Latency display in Scoreboard (No text)
                 var playerPing = new PingDisplay(ctx, scoreBoardX + 550, c.height - (scoreBoardY + 24 + (i - unjoinedPlayers - hiddenPlayers) * 20), s.ping, 3);
@@ -962,34 +972,33 @@ var drawEndscreen = function (ctx) {
 
     ctx.font = "24px PressStart2P"
     ctx.textAlign = "left"
-    ctx.fillStyle = "black";
-    ctx.fillText("Scoreboard", cornerX+8, cornerY+38);
+    ctx.fillStyle = "white";
+    ctx.coolText("Scoreboard", cornerX+8, cornerY+38);
 
     ctx.font = "8px PressStart2P";
     var n=0;
     for (var i = 0; i < scoreboard.length; i++) {
         s = scoreboard[i];
         if (s.joined) {
-            ctx.fillText((i-n + 1) + ". " + s.name + ": " + s.score + " points (" + s.ping + " ms)", cornerX+30, 40+cornerY + (1+i-n) * 20);
+            ctx.coolText((i-n + 1) + ". " + s.name + ": " + s.score + " points (" + s.ping + " ms)", cornerX+30, 40+cornerY + (1+i-n) * 20, 1);
         } else {
             n++;
         } 
     }
-    
 
     // Map Winner
     ctx.font = "16px PressStart2P";
     ctx.textAlign = "right";
-    ctx.fillText("This  round goes to...", roundOverWidth+cornerX - 20, cornerY+38);
-    ctx.font = "24px PressStart2P";
+    ctx.coolText("This  round goes to...", roundOverWidth+cornerX - 20, cornerY+38);
+    ctx.font = "16px PressStart2P";
     ctx.textAlign = "center"
-    ctx.fillText(scoreboard[0].name, cornerX+roundOverWidth-195, cornerY+100)
+    ctx.coolText(scoreboard[0].name, cornerX+roundOverWidth-195, cornerY+100)
     
     
     // Map Vote    
     ctx.font = "16px PressStart2P";
     ctx.textAlign = "right";
-    ctx.fillText("Vote for the next map:", cornerX+roundOverWidth-20, cornerY+200);
+    ctx.coolText("Vote for the next map:", cornerX+roundOverWidth-20, cornerY+200);
     sprites.draw(ctx, "/assets/images/akirabg.png", cornerX+roundOverWidth-195, cornerY+220, 175, 100)
     sprites.draw(ctx, "/assets/images/akirabg.png", cornerX+roundOverWidth-375, cornerY+220, 175, 100)
     sprites.draw(ctx, "/assets/images/akirabg.png", cornerX+roundOverWidth-195, cornerY+325, 175, 100)
@@ -1000,14 +1009,13 @@ var drawEndscreen = function (ctx) {
     ctx.font = "24px PressStart2P"
     var s = Math.floor(state.timeRemaining/1000);
     ctx.textAlign = "right";
-    ctx.fillText("Next map in "+s+"...", cornerX+roundOverWidth-30, cornerY+roundOverHeight-10);
+    ctx.coolText("Next map in "+s+"...", cornerX+roundOverWidth-30, cornerY+roundOverHeight-10);
     
     // Above Text
     ctx.fillStyle = "white"
     ctx.textAlign = "center"
     ctx.font = "32px PressStart2P";
-    ctx.fillText("Round over", c.width / 2, 50);
-    ctx.strokeText("Round over", c.width / 2, 50);
+    ctx.coolText("Round over", c.width / 2, 50);
 
 }
 
@@ -1295,22 +1303,18 @@ var titleScreenRefresh = function () {
         ctx.strokeStyle = "#000"
         ctx.font = "40px PressStart2P";
         ctx.textAlign = "center";
-        ctx.fillText("Loading GFX... "+Math.round(sprites.finished*100/sprites.spriteCount)+"%", c.width/2, 600);
-        ctx.strokeText("Loading GFX... "+Math.round(sprites.finished*100/sprites.spriteCount)+"%", c.width/2, 600);
+        ctx.coolText("Loading GFX... "+Math.round(sprites.finished*100/sprites.spriteCount)+"%", c.width/2, 600);
         ctx.font = "24px PressStart2P";
-        ctx.fillText(sprites.currentlyLoading, c.width/2, 650);
-        ctx.strokeText(sprites.currentlyLoading, c.width/2, 650);
+        ctx.coolText(sprites.currentlyLoading, c.width/2, 650);
     }
     if (sprites.loaded() && !sounds.loaded()) {
         ctx.fillStyle = "#fff"
         ctx.strokeStyle = "#000"
         ctx.font = "40px PressStart2P";
         ctx.textAlign = "center";
-        ctx.fillText("Loading SFX... "+Math.round(sounds.finished*100/sounds.soundCount)+"%", c.width/2, 600);
-        ctx.strokeText("Loading SFX... "+Math.round(sounds.finished*100/sounds.soundCount)+"%", c.width/2, 600);
+        ctx.coolText("Loading SFX... "+Math.round(sounds.finished*100/sounds.soundCount)+"%", c.width/2, 600);
         ctx.font = "24px PressStart2P";
-        ctx.fillText(sounds.currentlyLoading, c.width/2, 650);
-        ctx.strokeText(sounds.currentlyLoading, c.width/2, 650);
+        ctx.coolText(sounds.currentlyLoading, c.width/2, 650);
     }
     
     if (!sprites.loaded() || !sounds.loaded()) return;
@@ -1323,8 +1327,7 @@ var titleScreenRefresh = function () {
         ctx.strokeStyle = "#000"
         ctx.font = "40px PressStart2P";
         ctx.textAlign = "center";
-        ctx.fillText("PRESS ANY KEY", c.width/2, 650);
-        ctx.strokeText("PRESS ANY KEY", c.width/2, 650);
+        ctx.coolText("PRESS ANY KEY", c.width/2, 650);
     }
 
     ctx.strokeStyle = "#fff"
