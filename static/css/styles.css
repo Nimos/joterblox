@@ -54,25 +54,18 @@ canvas:hover {
     font-family: 'PressStart2P';
     src: url('/assets/PressStart2P.ttf') format('truetype');
 }
+
 #links {
-	position:fixed;
-	left:0;
-	bottom:0;
-	height:50px;
-	width:100%;
-	background-color:#111629;
-	padding-top: 10px;
+	margin-top: 75px;
 }
 
 #links li {
-	list-style-type: none;
 	display: inline-block;
-	padding: 0 10px 0 10px;
 }
 
 #links img {
 	max-height: 40px;
-	margin-bottom: 5px;
+	padding: 0 10px 0 10px;
 }
 
 #links a {
