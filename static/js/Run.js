@@ -1147,7 +1147,7 @@ var connect = function () {
     // Sync some settings from the serverside profile
     sock.on("login", function (p) {
         profile = p;
-        if (nameinput) nameinput.text = p.username;
+        if (nameinput && p.username) nameinput.text = p.username;
     });
 }
 
