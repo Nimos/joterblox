@@ -494,7 +494,7 @@ var animFrames = 0;
 
 // draw mouse cursor
 var drawCursor = function () {
-    ctx.strokeStyle = "#f0f"
+    ctx.strokeStyle = "#f0f";
     ctx.strokeRect(cursor[0] - 1, cursor[1] - 1, 2, 2);
     ctx.beginPath();
     ctx.moveTo(cursor[0] + 4, cursor[1] + 4);
