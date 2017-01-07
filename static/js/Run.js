@@ -1222,7 +1222,7 @@ document.onkeydown = function (e) {
     } else {
         // Open the chat screen on enter/t
         if (e.keyCode == "84" || e.keyCode == "13") {
-            if (hud.screen != 2) showChat();
+            if (hud.screen != 2 && hud.screen != undefined) showChat();
         }
     }
 
