@@ -324,6 +324,7 @@ var CanvasInput = function (ctx, name, x, y, width) {
             // If cursor is inside the coords, the user has clicked the input field.
             if (minX < cursor[0] && cursor[0] < maxX && minY < cursor[1] && cursor[1] < maxY) {
                 selectedInput = allInputs[i];
+                break;
             }
         }
     };
